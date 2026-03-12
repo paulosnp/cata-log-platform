@@ -58,6 +58,7 @@ As instruções de inicialização dos ambientes de desenvolvimento estarão dis
 git clone [https://github.com/paulosnp/cata-log.git](https://github.com/paulosnp/cata-log.git)
 ```
 --- Equipe do Projeto ---
+
 Paulo Ricardo Cardoso: Líder do Projeto / Desenvolvedor Backend
 
 João Pedro Pontes: Desenvolvedor Frontend / UX/UI Design
