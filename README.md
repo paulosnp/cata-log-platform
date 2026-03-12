@@ -1,10 +1,22 @@
-# Cata Log 🏺📱
+<p align="center">
+  <img src="logo.svg" alt="Cata Log Logo" width="300"/>
+</p>
 
-> **Status do Projeto:** 🚧 Em Planejamento (Fase de Requisitos e Arquitetura) 🚧
+<h1 align="center">Cata Log</h1>
 
-O **Cata Log** é um Marketplace Cultural e Vitrine Digital desenhado especificamente para abstrair a complexidade tecnológica e dar visibilidade aos artesãos e produtores culturais de Pernambuco. 
+<p align="center">
+  <strong>Hub de Visibilidade e Letramento Digital para Microempreendedores da Cultura Pernambucana</strong>
+</p>
 
-A plataforma atua aliada a um processo de letramento digital, garantindo a inclusão tecnológica e a autonomia desses empreendedores sem a complexidade operacional de um e-commerce tradicional.
+<p align="center">
+  <img src="https://img.shields.io/badge/Status-Em%20Planejamento-yellow" alt="Status">
+</p>
+
+<br>
+
+O **Cata Log** é um Marketplace Cultural desenhado especificamente para abstrair a complexidade tecnológica e dar visibilidade aos pequenos produtores de Pernambuco. 
+
+A plataforma atua aliada a um processo de letramento digital, garantindo a autonomia desses empreendedores sem a complexidade operacional de um e-commerce tradicional.
 
 ---
 
@@ -44,3 +56,16 @@ As instruções de inicialização dos ambientes de desenvolvimento estarão dis
 ```bash
 # Exemplo futuro de clonagem
 git clone [https://github.com/paulosnp/cata-log.git](https://github.com/paulosnp/cata-log.git)
+
+--- Equipe do Projeto ---
+Paulo Ricardo Cardoso: Líder do Projeto / Desenvolvedor Backend
+
+João Pedro Pontes: Desenvolvedor Frontend / UX/UI Design
+
+Eduardo Dourado: Desenvolvedor Backend
+
+Vitória: Documentação / Dreamshaper
+
+Caio Henrique: Documentação / Dreamshaper
+
+Rafael Santana: Documentação / Dreamshaper
