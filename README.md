@@ -55,18 +55,12 @@ As instruções de inicialização dos ambientes de desenvolvimento estarão dis
 
 ```bash
 # Exemplo futuro de clonagem
-git clone [https://github.com/paulosnp/cata-log.git](https://github.com/paulosnp/cata-log.git)
+git clone https://github.com/paulosnp/cata-log-platform
 ```
---- Equipe do Projeto ---
-
-Paulo Ricardo Cardoso: Líder do Projeto / Desenvolvedor Backend
-
-João Pedro Pontes: Desenvolvedor Frontend / UX/UI Design
-
-Eduardo Dourado: Desenvolvedor Backend
-
-Vitória: Documentação / Dreamshaper
-
-Caio Henrique: Documentação / Dreamshaper
-
-Rafael Santana: Documentação / Dreamshaper
+## 👥 Equipe do Projeto
+* **Paulo Ricardo Cardoso:** Líder do Projeto / Desenvolvedor Backend
+* **João Pedro Pontes:** Desenvolvedor Frontend / UX/UI Design
+* **Eduardo Dourado:** Desenvolvedor Backend
+* **Vitória:** Documentação / Dreamshaper
+* **Caio Henrique:** Documentação / Dreamshaper
+* **Rafael Santana:** Documentação / Dreamshaper
