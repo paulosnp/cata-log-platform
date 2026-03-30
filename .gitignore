@@ -1,0 +1,40 @@
+# =============================================================
+# Cata Log Platform — .gitignore (Raiz)
+# =============================================================
+# ✅ O QUE SOBE: docker-compose.yml, scripts Flyway, código Java,
+#    pom.xml, application.properties
+# 🔴 O QUE NÃO SOBE: dados do PostgreSQL, target/, IDE configs
+# =============================================================
+
+# ----- Dados do PostgreSQL (Volume Docker) -----
+# Os bytes reais do banco NUNCA vão para o Git.
+# O volume é gerenciado pelo Docker no seu computador.
+pgdata/
+data/
+
+# ----- IDE / Editor -----
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.project
+.classpath
+.settings/
+.factorypath
+.springBeans
+.sts4-cache
+*.swp
+*.swo
+*~
+
+# ----- Sistema Operacional -----
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+
+# ----- Variáveis de Ambiente (produção) -----
+.env
+*.env.local
+.env.production

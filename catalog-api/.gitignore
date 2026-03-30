@@ -1,0 +1,52 @@
+# =============================================================
+# Cata Log API — .gitignore (catalog-api)
+# =============================================================
+# ✅ SOBE: pom.xml, código Java, application.properties,
+#    scripts Flyway (db/migration/), mvnw, mvnw.cmd
+# 🔴 NÃO SOBE: target/, IDE configs, logs
+# =============================================================
+
+# ----- Build (código compilado — gerado automaticamente) -----
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# ----- IDE / Editor -----
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Eclipse / STS
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# VS Code
+.vscode/
+
+# ----- Sistema Operacional -----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ----- Logs -----
+*.log
+logs/
+
+# ----- Variáveis de Ambiente (produção) -----
+.env
+*.env.local
