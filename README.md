@@ -174,7 +174,6 @@ cata-log-platform/
 | **João Pedro Pontes** | Desenvolvedor Frontend / UX/UI Design |
 | **Eduardo Dourado** | Desenvolvedor Backend |
 | **Vitória** | Documentação / Dreamshaper |
-| **Caio Henrique** | Documentação / Dreamshaper |
 | **Rafael Santana** | Documentação / Dreamshaper |
 
 ---
