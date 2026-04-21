@@ -8,11 +8,8 @@ import org.hibernate.annotations.Immutable;
 import java.time.LocalDateTime;
 
 /**
- * Tabela de logs de auditoria IMUTÁVEL.
- * <p>
- * No banco, triggers impedem UPDATE e DELETE (V9).
- * No JPA, @Immutable garante que o Hibernate nunca gere UPDATE.
- * </p>
+ * Registro de auditoria IMUTÁVEL — protegido por triggers no banco (V9)
+ * e por @Immutable no Hibernate.
  */
 @Entity
 @Immutable
@@ -28,8 +25,6 @@ public class LogAuditoria {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // --- Atores do Evento (FKs opcionais) ---
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "admin_id")
     private Admin admin;
@@ -41,8 +36,6 @@ public class LogAuditoria {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comprador_id")
     private Comprador comprador;
-
-    // --- Dados do Evento ---
 
     @Column(nullable = false)
     private String acao;

@@ -40,8 +40,6 @@ public class Produto {
     @Column(name = "tempo_producao_dias")
     private Integer tempoProducaoDias = 0;
 
-    // --- Relacionamentos ---
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "categoria_id", nullable = false)
     private Categoria categoria;
@@ -50,16 +48,12 @@ public class Produto {
     @JoinColumn(name = "artesao_id", nullable = false)
     private Artesao artesao;
 
-    // --- Controle ---
-
     @Builder.Default
     private Boolean ativo = true;
 
     @Builder.Default
     @Column(name = "peca_unica")
     private Boolean pecaUnica = true;
-
-    // --- Atributos Físicos ---
 
     @Column(length = 100)
     private String material;
@@ -76,18 +70,12 @@ public class Produto {
     @Column(name = "altura_cm")
     private Integer alturaCm;
 
-    // --- Promoção ---
-
     @Builder.Default
     @Column(name = "em_promocao")
     private Boolean emPromocao = false;
 
-    // --- Status de Venda ---
-
     @Builder.Default
     private Boolean vendido = false;
-
-    // --- Auditoria ---
 
     @CreationTimestamp
     @Column(name = "criado_em", nullable = false, updatable = false)
@@ -96,8 +84,6 @@ public class Produto {
     @UpdateTimestamp
     @Column(name = "atualizado_em")
     private LocalDateTime atualizadoEm;
-
-    // --- Coleções ---
 
     @Builder.Default
     @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL, orphanRemoval = true)

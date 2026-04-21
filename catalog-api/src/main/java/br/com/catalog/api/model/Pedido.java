@@ -29,8 +29,6 @@ public class Pedido {
     @JoinColumn(name = "comprador_id", nullable = false)
     private Comprador comprador;
 
-    // --- Status ---
-
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "status_pagamento", length = 50)
@@ -41,15 +39,11 @@ public class Pedido {
     @Column(name = "status_entrega", length = 50)
     private StatusEntrega statusEntrega = StatusEntrega.AGUARDANDO_ENVIO;
 
-    // --- Integração Mercado Pago ---
-
     @Column(name = "id_transacao_mp", length = 100)
     private String idTransacaoMp;
 
     @Column(name = "codigo_rastreio_me", length = 100)
     private String codigoRastreioMe;
-
-    // --- Valores Financeiros ---
 
     @Column(name = "valor_total", nullable = false, precision = 10, scale = 2)
     private BigDecimal valorTotal;
@@ -59,8 +53,6 @@ public class Pedido {
 
     @Column(name = "valor_liquido_artesao", nullable = false, precision = 10, scale = 2)
     private BigDecimal valorLiquidoArtesao;
-
-    // --- Datas ---
 
     @Column(name = "data_entrega_realizada")
     private LocalDateTime dataEntregaRealizada;
@@ -72,8 +64,6 @@ public class Pedido {
     @UpdateTimestamp
     @Column(name = "atualizado_em")
     private LocalDateTime atualizadoEm;
-
-    // --- Itens ---
 
     @Builder.Default
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)

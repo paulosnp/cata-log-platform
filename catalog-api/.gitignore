@@ -1,25 +1,14 @@
-# =============================================================
-# Cata Log API — .gitignore (catalog-api)
-# =============================================================
-# ✅ SOBE: pom.xml, código Java, application.properties,
-#    scripts Flyway (db/migration/), mvnw, mvnw.cmd
-# 🔴 NÃO SOBE: target/, IDE configs, logs
-# =============================================================
-
-# ----- Build (código compilado — gerado automaticamente) -----
+# Build
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-# ----- IDE / Editor -----
-# IntelliJ IDEA
+# IDE
 .idea/
 *.iws
 *.iml
 *.ipr
-
-# Eclipse / STS
 .apt_generated
 .classpath
 .factorypath
@@ -27,26 +16,34 @@ target/
 .settings/
 .springBeans
 .sts4-cache
-
-# NetBeans
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
-
-# VS Code
 .vscode/
 
-# ----- Sistema Operacional -----
+# Sistema Operacional
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# ----- Logs -----
+# Logs
 *.log
 logs/
 
-# ----- Variáveis de Ambiente (produção) -----
+# Variáveis de Ambiente e Segredos
 .env
 *.env.local
+
+# Profiles Spring Boot com credenciais reais
+application-dev.properties
+application-prod.properties
+application-staging.properties
+
+# Keystores e certificados
+*.jks
+*.p12
+*.pem
+*.key
+*.crt

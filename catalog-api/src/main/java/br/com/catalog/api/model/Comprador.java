@@ -22,8 +22,6 @@ public class Comprador {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // --- Autenticação ---
-
     @Column(nullable = false, length = 150)
     private String nome;
 
@@ -35,8 +33,6 @@ public class Comprador {
 
     @Column(unique = true, length = 14)
     private String cpf;
-
-    // --- Contato & Logística ---
 
     @Column(name = "telefone_whatsapp", length = 20)
     private String telefoneWhatsapp;
@@ -61,8 +57,6 @@ public class Comprador {
     @Column(length = 2)
     private String estado;
 
-    // --- Controle ---
-
     @Builder.Default
     private Boolean ativo = true;
 
@@ -77,8 +71,6 @@ public class Comprador {
     @Column(name = "config_confirmacao_leitura")
     private Boolean configConfirmacaoLeitura = true;
 
-    // --- Auditoria ---
-
     @CreationTimestamp
     @Column(name = "criado_em", nullable = false, updatable = false)
     private LocalDateTime criadoEm;
@@ -86,8 +78,6 @@ public class Comprador {
     @UpdateTimestamp
     @Column(name = "atualizado_em")
     private LocalDateTime atualizadoEm;
-
-    // --- Relacionamentos ---
 
     @Builder.Default
     @OneToMany(mappedBy = "comprador")

@@ -24,8 +24,6 @@ public class EncomendaPersonalizada {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // --- Atores ---
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comprador_id", nullable = false)
     private Comprador comprador;
@@ -38,8 +36,6 @@ public class EncomendaPersonalizada {
     @JoinColumn(name = "produto_referencia_id")
     private Produto produtoReferencia;
 
-    // --- Detalhes da Negociação ---
-
     @Column(name = "observacoes_cliente", nullable = false, columnDefinition = "TEXT")
     private String observacoesCliente;
 
@@ -49,33 +45,21 @@ public class EncomendaPersonalizada {
     @Column(name = "tempo_producao_dias")
     private Integer tempoProducaoDias;
 
-    // --- Máquina de Estados ---
-
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(length = 50)
     private StatusEncomenda status = StatusEncomenda.AGUARDANDO_ARTESAO;
 
-    // --- Acordo & Escrow ---
-
     @Column(name = "data_aceite")
     private LocalDateTime dataAceite;
 
-    /**
-     * Valor retido em conta garantia (Escrow).
-     * Representa 30% do preço acordado, retido até a conclusão da encomenda.
-     */
+    /** 30% do preço acordado, retido em conta garantia até a conclusão da encomenda. */
     @Column(name = "valor_retido", precision = 10, scale = 2)
     private BigDecimal valorRetido;
 
-    /**
-     * Taxa de cancelamento (Fee).
-     * Aplicada quando o cancelamento ocorre após o acordo de preço (CANCELADO_COM_TAXA).
-     */
+    /** Taxa aplicada em cancelamentos após acordo de preço (status CANCELADO_COM_TAXA). */
     @Column(name = "taxa_cancelamento", precision = 10, scale = 2)
     private BigDecimal taxaCancelamento;
-
-    // --- Auditoria ---
 
     @CreationTimestamp
     @Column(name = "criado_em", nullable = false, updatable = false)
@@ -84,8 +68,6 @@ public class EncomendaPersonalizada {
     @UpdateTimestamp
     @Column(name = "atualizado_em")
     private LocalDateTime atualizadoEm;
-
-    // --- Chat ---
 
     @Builder.Default
     @OneToMany(mappedBy = "encomenda", cascade = CascadeType.ALL, orphanRemoval = true)

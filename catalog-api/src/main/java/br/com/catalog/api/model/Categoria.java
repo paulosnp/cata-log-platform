@@ -39,8 +39,6 @@ public class Categoria {
     @Column(name = "atualizado_em")
     private LocalDateTime atualizadoEm;
 
-    // --- Relacionamentos ---
-
     @Builder.Default
     @OneToMany(mappedBy = "categoria")
     private List<Produto> produtos = new ArrayList<>();
