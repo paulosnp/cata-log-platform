@@ -2,6 +2,10 @@
 pgdata/
 data/
 
+# Node.js
+node_modules/
+dist/
+
 # IDE / Editor
 .idea/
 .vscode/

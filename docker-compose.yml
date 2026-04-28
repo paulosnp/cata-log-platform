@@ -20,6 +20,18 @@ services:
       timeout: 5s
       retries: 5
 
+  catalog-web:
+    build:
+      context: ./catalog-web
+      dockerfile: Dockerfile
+    container_name: catalog-web
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 volumes:
   catalog_data:
     name: catalog-db-data

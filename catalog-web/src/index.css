@@ -1,0 +1,90 @@
+:root {
+  /* === Cata Log Design System: "Artisan Curated" === */
+
+  /* Primary */
+  --color-primary: #b22300;
+  --color-primary-container: #dc340a;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #fffbff;
+  --color-primary-fixed: #ffdad2;
+  --color-primary-fixed-dim: #ffb4a3;
+
+  /* Secondary */
+  --color-secondary: #a33d26;
+  --color-secondary-container: #ff8164;
+
+  /* Tertiary */
+  --color-tertiary: #b61722;
+  --color-tertiary-container: #da3437;
+
+  /* Surface & Background */
+  --color-background: #faf9f7;
+  --color-surface: #faf9f7;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f4f3f1;
+  --color-surface-container: #efeeec;
+  --color-surface-container-high: #e9e8e6;
+  --color-surface-container-highest: #e3e2e0;
+  --color-surface-dim: #dadad8;
+  --color-surface-tint: #b62400;
+
+  /* On Surface */
+  --color-on-background: #1a1c1b;
+  --color-on-surface: #1a1c1b;
+  --color-on-surface-variant: #5c4039;
+
+  /* Outline */
+  --color-outline: #916f68;
+  --color-outline-variant: #e5beb5;
+
+  /* Inverse */
+  --color-inverse-surface: #2f3130;
+  --color-inverse-on-surface: #f1f1ef;
+  --color-inverse-primary: #ffb4a3;
+
+  /* Error */
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+
+  /* Typography */
+  --font-headline: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* Roundness */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-full: 9999px;
+
+  /* Shadows — Ambient only */
+  --shadow-ambient: 0px 12px 32px rgba(26, 28, 27, 0.06);
+  --shadow-elevated: 0px 20px 48px rgba(26, 28, 27, 0.08);
+
+  /* Transitions */
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-background);
+  color: var(--color-on-surface);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
