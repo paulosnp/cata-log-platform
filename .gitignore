@@ -2,6 +2,13 @@
 pgdata/
 data/
 
+# Override local (dev) — NÃO enviar para produção
+docker-compose.override.yml
+
+# Documentação interna de Sprints (planos e relatórios)
+Sprint *.md
+Cata Log Documento de Requisitos V7.md
+
 # Node.js
 node_modules/
 dist/
