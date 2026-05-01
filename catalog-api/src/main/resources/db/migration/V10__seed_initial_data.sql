@@ -1,4 +1,3 @@
--- Admin mestre (senha: CatalogAdmin123!)
 INSERT INTO tb_admin (email, senha)
 SELECT 'admin@catalog.com.br',
        '$2b$10$kGsRHsJiaDr6P9JQ1SpWnObDDnOg10GWabJcGOt3hyHE5a3aRe1x6'
