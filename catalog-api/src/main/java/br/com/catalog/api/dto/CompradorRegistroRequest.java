@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.validator.constraints.br.CPF;
 
 @Getter
 @Setter
@@ -15,7 +14,7 @@ import org.hibernate.validator.constraints.br.CPF;
 @AllArgsConstructor
 public class CompradorRegistroRequest {
 
-    @NotBlank
+    @NotBlank(message = "O nome é obrigatório")
     private String nome;
 
     @NotBlank
@@ -25,11 +24,5 @@ public class CompradorRegistroRequest {
     @NotBlank
     @Size(min = 6, message = "A senha deve ter no mínimo 6 caracteres")
     private String senha;
-
-    @NotBlank
-    @CPF(message = "CPF inválido")
-    private String cpf;
-
-    @NotBlank
-    private String cep;
 }
+

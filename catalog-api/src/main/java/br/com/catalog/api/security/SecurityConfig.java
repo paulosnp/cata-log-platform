@@ -57,6 +57,9 @@ public class SecurityConfig {
                         // RN-02: Rotas administrativas restritas a ROLE_ADMIN
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
 
+                        // Carrinho e Pedidos — autenticado (Sprint 7)
+                        // Proteção granular via @PreAuthorize("hasRole('COMPRADOR')") nos controllers
+
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

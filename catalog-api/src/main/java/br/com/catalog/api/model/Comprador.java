@@ -37,7 +37,7 @@ public class Comprador {
     @Column(name = "telefone_whatsapp", length = 20)
     private String telefoneWhatsapp;
 
-    @Column(nullable = false, length = 9)
+    @Column(length = 9)
     private String cep;
 
     private String endereco;

@@ -47,8 +47,6 @@ public class RegistroService {
                 .nome(request.getNome())
                 .email(request.getEmail())
                 .senha(passwordEncoder.encode(request.getSenha()))
-                .cpf(request.getCpf())
-                .cep(request.getCep())
                 .build();
 
         compradorRepository.save(comprador);

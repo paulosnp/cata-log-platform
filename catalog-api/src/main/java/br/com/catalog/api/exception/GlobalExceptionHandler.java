@@ -54,6 +54,16 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.CONFLICT, ex.getMessage());
     }
 
+    @ExceptionHandler(ProdutoIndisponivelException.class)
+    public ResponseEntity<Map<String, Object>> handleProdutoIndisponivel(ProdutoIndisponivelException ex) {
+        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(CarrinhoVazioException.class)
+    public ResponseEntity<Map<String, Object>> handleCarrinhoVazio(CarrinhoVazioException ex) {
+        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, Object>> handleIllegalArgument(IllegalArgumentException ex) {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
