@@ -44,6 +44,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/produtos/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/categorias/**").permitAll()
 
+                        // Imagens estáticas dos produtos (Sprint 6)
+                        .requestMatchers("/imagens/**").permitAll()
+
                         // Swagger / OpenAPI (RNF-DOC01)
                         .requestMatchers(
                                 "/swagger-ui/**",

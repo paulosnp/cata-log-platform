@@ -11,13 +11,16 @@ import br.com.catalog.api.model.Produto;
 import br.com.catalog.api.model.ProdutoImagem;
 import br.com.catalog.api.repository.ArtesaoRepository;
 import br.com.catalog.api.repository.CategoriaRepository;
+import br.com.catalog.api.repository.ProdutoImagemRepository;
 import br.com.catalog.api.repository.ProdutoRepository;
 import br.com.catalog.api.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -31,7 +34,12 @@ public class ProdutoService {
     private final ProdutoRepository produtoRepository;
     private final CategoriaRepository categoriaRepository;
     private final ArtesaoRepository artesaoRepository;
+    private final ProdutoImagemRepository produtoImagemRepository;
+    private final ArmazenamentoImagemService armazenamentoService;
     private final SecurityUtils securityUtils;
+
+    @Value("${app.upload.max-images-per-product:5}")
+    private int maxImagensPorProduto;
 
     // ======================== VITRINE PÚBLICA ========================
 
@@ -150,6 +158,51 @@ public class ProdutoService {
         produto.setVendido(true);
         Produto salvo = produtoRepository.save(produto);
         return toResponse(salvo);
+    }
+
+    // ======================== UPLOAD DE IMAGENS ========================
+
+    @Transactional
+    public ProdutoResponse uploadImagem(Long produtoId, MultipartFile arquivo) {
+        Produto produto = buscarProdutoComValidacao(produtoId);
+
+        int totalImagens = produtoImagemRepository.countByProdutoId(produtoId);
+        if (totalImagens >= maxImagensPorProduto) {
+            throw new IllegalArgumentException(
+                    "Limite de " + maxImagensPorProduto + " imagens por produto atingido."
+            );
+        }
+
+        String url = armazenamentoService.salvar(arquivo);
+
+        ProdutoImagem imagem = ProdutoImagem.builder()
+                .produto(produto)
+                .urlImagem(url)
+                .ordem(totalImagens + 1)
+                .build();
+
+        produtoImagemRepository.save(imagem);
+
+        Produto atualizado = produtoRepository.findById(produtoId).orElseThrow();
+        return toResponse(atualizado);
+    }
+
+    @Transactional
+    public ProdutoResponse removerImagem(Long produtoId, Long imagemId) {
+        Produto produto = buscarProdutoComValidacao(produtoId);
+
+        ProdutoImagem imagem = produtoImagemRepository.findById(imagemId)
+                .orElseThrow(() -> new IllegalArgumentException("Imagem não encontrada."));
+
+        if (!imagem.getProduto().getId().equals(produtoId)) {
+            throw new AcessoNegadoException("Esta imagem não pertence a este produto.");
+        }
+
+        armazenamentoService.deletar(imagem.getUrlImagem());
+        produtoImagemRepository.delete(imagem);
+
+        Produto atualizado = produtoRepository.findById(produtoId).orElseThrow();
+        return toResponse(atualizado);
     }
 
     // ======================== MÉTODOS PRIVADOS ========================

@@ -19,7 +19,8 @@ WORKDIR /app
 
 COPY --from=build /app/target/app.jar app.jar
 
-RUN chown catalog:catalog app.jar
+RUN mkdir -p /app/uploads/imagens && \
+    chown -R catalog:catalog /app/uploads app.jar
 
 USER catalog
 
