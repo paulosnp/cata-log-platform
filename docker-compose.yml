@@ -30,6 +30,8 @@ services:
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
       SERVER_PORT: 8080
+      STREAM_CHAT_API_KEY: ${STREAM_CHAT_API_KEY}
+      STREAM_CHAT_API_SECRET: ${STREAM_CHAT_API_SECRET}
       TZ: America/Sao_Paulo
     volumes:
       - catalog_uploads:/app/uploads
