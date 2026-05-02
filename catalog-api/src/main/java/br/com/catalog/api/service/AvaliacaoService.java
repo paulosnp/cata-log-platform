@@ -81,7 +81,7 @@ public class AvaliacaoService {
         BigDecimal mediaArredondada = BigDecimal.valueOf(media)
                 .setScale(2, RoundingMode.HALF_UP);
 
-        produto.setNotaMedia(mediaArredondada.doubleValue());
+        produto.setNotaMedia(mediaArredondada);
         produto.setTotalAvaliacoes(total);
         produtoRepository.save(produto);
     }

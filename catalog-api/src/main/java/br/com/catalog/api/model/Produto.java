@@ -78,8 +78,8 @@ public class Produto {
     private Boolean vendido = false;
 
     @Builder.Default
-    @Column(name = "nota_media", precision = 3, scale = 2)
-    private Double notaMedia = 0.0;
+    @Column(name = "nota_media")
+    private BigDecimal notaMedia = BigDecimal.ZERO;
 
     @Builder.Default
     @Column(name = "total_avaliacoes")

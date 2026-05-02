@@ -43,6 +43,7 @@ public class SecurityConfig {
                         // Vitrine pública — leitura sem autenticação (RF-BK03)
                         .requestMatchers(HttpMethod.GET, "/api/v1/produtos/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/categorias/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/artesaos/vitrine").permitAll()
 
                         // Imagens estáticas dos produtos (Sprint 6)
                         .requestMatchers("/imagens/**").permitAll()

@@ -14,10 +14,12 @@ import br.com.catalog.api.repository.CategoriaRepository;
 import br.com.catalog.api.repository.ProdutoImagemRepository;
 import br.com.catalog.api.repository.ProdutoRepository;
 import br.com.catalog.api.security.SecurityUtils;
+import br.com.catalog.api.specification.ProdutoSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -46,6 +48,27 @@ public class ProdutoService {
     public Page<ProdutoResponse> listarVitrine(Pageable pageable) {
         return produtoRepository.findAllAtivosVitrine(pageable)
                 .map(this::toResponse);
+    }
+
+    public Page<ProdutoResponse> buscarVitrine(String termo, Long categoriaId,
+                                               BigDecimal precoMin, BigDecimal precoMax,
+                                               Pageable pageable) {
+        Specification<Produto> spec = ProdutoSpecification.vitrineBase();
+
+        if (termo != null && !termo.isBlank()) {
+            spec = spec.and(ProdutoSpecification.nomeContains(termo));
+        }
+        if (categoriaId != null) {
+            spec = spec.and(ProdutoSpecification.categoriaIdEquals(categoriaId));
+        }
+        if (precoMin != null) {
+            spec = spec.and(ProdutoSpecification.precoMinimo(precoMin));
+        }
+        if (precoMax != null) {
+            spec = spec.and(ProdutoSpecification.precoMaximo(precoMax));
+        }
+
+        return produtoRepository.findAll(spec, pageable).map(this::toResponse);
     }
 
     public Page<ProdutoResponse> listarVitrinePorCategoria(Long categoriaId, Pageable pageable) {

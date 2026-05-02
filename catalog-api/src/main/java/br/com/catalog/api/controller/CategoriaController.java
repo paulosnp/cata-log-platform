@@ -5,6 +5,9 @@ import br.com.catalog.api.dto.CategoriaResponse;
 import br.com.catalog.api.service.CategoriaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,6 +24,13 @@ public class CategoriaController {
     private final CategoriaService categoriaService;
 
     // ======================== ROTAS PÚBLICAS ========================
+
+    @GetMapping("/busca")
+    public ResponseEntity<Page<CategoriaResponse>> buscarPorNome(
+            @RequestParam(required = false) String nome,
+            @PageableDefault(size = 20) Pageable pageable) {
+        return ResponseEntity.ok(categoriaService.buscarPorNome(nome, pageable));
+    }
 
     @GetMapping
     public ResponseEntity<List<CategoriaResponse>> listarAtivas() {

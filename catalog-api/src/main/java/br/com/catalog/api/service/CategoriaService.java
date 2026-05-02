@@ -7,6 +7,8 @@ import br.com.catalog.api.model.Categoria;
 import br.com.catalog.api.repository.CategoriaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +20,18 @@ import java.util.stream.Collectors;
 public class CategoriaService {
 
     private final CategoriaRepository categoriaRepository;
+
+    public Page<CategoriaResponse> buscarPorNome(String nome, Pageable pageable) {
+        Page<Categoria> categorias;
+
+        if (nome != null && !nome.isBlank()) {
+            categorias = categoriaRepository.findByNomeContainingIgnoreCaseAndAtivoTrue(nome, pageable);
+        } else {
+            categorias = categoriaRepository.findByAtivoTrue(pageable);
+        }
+
+        return categorias.map(this::toResponse);
+    }
 
     public List<CategoriaResponse> listarAtivas() {
         return categoriaRepository.findByAtivoTrue().stream()

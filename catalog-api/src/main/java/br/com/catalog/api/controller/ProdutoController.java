@@ -16,6 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 @RestController
@@ -26,6 +27,16 @@ public class ProdutoController {
     private final ProdutoService produtoService;
 
     // ======================== ROTAS PÚBLICAS ========================
+
+    @GetMapping("/vitrine")
+    public ResponseEntity<Page<ProdutoResponse>> buscarVitrine(
+            @RequestParam(required = false) String termo,
+            @RequestParam(required = false) Long categoriaId,
+            @RequestParam(required = false) BigDecimal precoMin,
+            @RequestParam(required = false) BigDecimal precoMax,
+            @PageableDefault(size = 20) Pageable pageable) {
+        return ResponseEntity.ok(produtoService.buscarVitrine(termo, categoriaId, precoMin, precoMax, pageable));
+    }
 
     @GetMapping
     public ResponseEntity<Page<ProdutoResponse>> listarVitrine(

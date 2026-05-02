@@ -1,6 +1,8 @@
 package br.com.catalog.api.repository;
 
 import br.com.catalog.api.model.Artesao;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,4 +12,8 @@ import java.util.Optional;
 public interface ArtesaoRepository extends JpaRepository<Artesao, Long> {
 
     Optional<Artesao> findByEmail(String email);
+
+    Page<Artesao> findByNomeAtelieContainingIgnoreCaseAndAtivoTrue(String nomeAtelie, Pageable pageable);
+
+    Page<Artesao> findByAtivoTrue(Pageable pageable);
 }
