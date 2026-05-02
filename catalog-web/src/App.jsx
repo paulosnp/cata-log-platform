@@ -22,7 +22,7 @@ function App() {
         </p>
       </div>
 
-      <p className="footer-info">Cata Log Platform &bull; v0.1.4</p>
+      <p className="footer-info">Cata Log Platform &bull; v0.1.5</p>
     </div>
   )
 }
