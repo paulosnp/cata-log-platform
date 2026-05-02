@@ -34,6 +34,8 @@ public class ProdutoResponse {
     private String artesaoNomeAtelie;
     private Long artesaoId;
     private Boolean artesaoSeloVerificado;
+    private Double notaMedia;
+    private Integer totalAvaliacoes;
     private List<String> imagensUrls;
     private LocalDateTime criadoEm;
 }

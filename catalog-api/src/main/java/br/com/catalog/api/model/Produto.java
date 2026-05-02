@@ -77,6 +77,14 @@ public class Produto {
     @Builder.Default
     private Boolean vendido = false;
 
+    @Builder.Default
+    @Column(name = "nota_media", precision = 3, scale = 2)
+    private Double notaMedia = 0.0;
+
+    @Builder.Default
+    @Column(name = "total_avaliacoes")
+    private Integer totalAvaliacoes = 0;
+
     @CreationTimestamp
     @Column(name = "criado_em", nullable = false, updatable = false)
     private LocalDateTime criadoEm;

@@ -260,6 +260,8 @@ public class ProdutoService {
                 .artesaoNomeAtelie(p.getArtesao().getNomeAtelie())
                 .artesaoId(p.getArtesao().getId())
                 .artesaoSeloVerificado(p.getArtesao().getSeloVerificado())
+                .notaMedia(p.getNotaMedia())
+                .totalAvaliacoes(p.getTotalAvaliacoes())
                 .imagensUrls(p.getImagens() != null
                         ? p.getImagens().stream().map(ProdutoImagem::getUrlImagem).collect(Collectors.toList())
                         : Collections.emptyList())

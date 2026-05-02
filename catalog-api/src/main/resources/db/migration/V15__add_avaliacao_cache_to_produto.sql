@@ -1,0 +1,2 @@
+ALTER TABLE tb_produto ADD COLUMN nota_media DECIMAL(3,2) DEFAULT 0;
+ALTER TABLE tb_produto ADD COLUMN total_avaliacoes INTEGER DEFAULT 0;
