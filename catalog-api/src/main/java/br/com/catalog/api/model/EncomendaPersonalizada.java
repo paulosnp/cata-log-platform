@@ -61,6 +61,10 @@ public class EncomendaPersonalizada {
     @Column(name = "taxa_cancelamento", precision = 10, scale = 2)
     private BigDecimal taxaCancelamento;
 
+    /** ID do canal no Stream Chat para comunicação em tempo real. */
+    @Column(name = "stream_channel_id")
+    private String streamChannelId;
+
     @CreationTimestamp
     @Column(name = "criado_em", nullable = false, updatable = false)
     private LocalDateTime criadoEm;
