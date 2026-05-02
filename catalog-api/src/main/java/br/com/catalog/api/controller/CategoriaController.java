@@ -45,20 +45,20 @@ public class CategoriaController {
     // ======================== ROTAS DO ADMIN ========================
 
     @GetMapping("/admin")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<CategoriaResponse>> listarTodas() {
         return ResponseEntity.ok(categoriaService.listarTodas());
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<CategoriaResponse> criar(@RequestBody @Valid CategoriaRequest request) {
         CategoriaResponse categoria = categoriaService.criar(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(categoria);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<CategoriaResponse> atualizar(
             @PathVariable Long id,
             @RequestBody @Valid CategoriaRequest request) {
@@ -66,7 +66,7 @@ public class CategoriaController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Map<String, String>> deletar(@PathVariable Long id) {
         categoriaService.deletar(id);
         return ResponseEntity.ok(Map.of("mensagem", "Categoria desativada com sucesso."));

@@ -55,11 +55,11 @@ public class SecurityConfig {
                                 "/v3/api-docs/**"
                         ).permitAll()
 
-                        // RN-02: Rotas administrativas restritas a ROLE_ADMIN
-                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                        // RN-02: Rotas administrativas restritas a ADMIN
+                        .requestMatchers("/api/v1/admin/**").hasAuthority("ADMIN")
 
                         // Carrinho e Pedidos — autenticado (Sprint 7)
-                        // Proteção granular via @PreAuthorize("hasRole('COMPRADOR')") nos controllers
+                        // Proteção granular via @PreAuthorize("hasAuthority('...')") nos controllers
 
                         .anyRequest().authenticated()
                 )

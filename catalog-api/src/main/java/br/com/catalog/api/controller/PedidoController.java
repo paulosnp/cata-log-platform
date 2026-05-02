@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/pedidos")
-@PreAuthorize("hasRole('COMPRADOR')")
+@PreAuthorize("hasAuthority('COMPRADOR')")
 @RequiredArgsConstructor
 public class PedidoController {
 

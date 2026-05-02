@@ -58,21 +58,21 @@ public class ProdutoController {
     // ======================== ROTAS DO ARTESÃO ========================
 
     @GetMapping("/meus")
-    @PreAuthorize("hasRole('ARTESAO')")
+    @PreAuthorize("hasAuthority('ARTESAO')")
     public ResponseEntity<Page<ProdutoResponse>> listarMeusProdutos(
             @PageableDefault(size = 20) Pageable pageable) {
         return ResponseEntity.ok(produtoService.listarMeusProdutos(pageable));
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ARTESAO')")
+    @PreAuthorize("hasAuthority('ARTESAO')")
     public ResponseEntity<ProdutoResponse> criarProduto(@RequestBody @Valid ProdutoRequest request) {
         ProdutoResponse produto = produtoService.criarProduto(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(produto);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ARTESAO')")
+    @PreAuthorize("hasAuthority('ARTESAO')")
     public ResponseEntity<ProdutoResponse> atualizarProduto(
             @PathVariable Long id,
             @RequestBody @Valid ProdutoRequest request) {
@@ -80,14 +80,14 @@ public class ProdutoController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ARTESAO')")
+    @PreAuthorize("hasAuthority('ARTESAO')")
     public ResponseEntity<Map<String, String>> deletarProduto(@PathVariable Long id) {
         produtoService.deletarProduto(id);
         return ResponseEntity.ok(Map.of("mensagem", "Produto desativado com sucesso."));
     }
 
     @PatchMapping("/{id}/promocao")
-    @PreAuthorize("hasRole('ARTESAO')")
+    @PreAuthorize("hasAuthority('ARTESAO')")
     public ResponseEntity<ProdutoResponse> aplicarPromocao(
             @PathVariable Long id,
             @RequestBody @Valid PromocaoRequest request) {
@@ -95,7 +95,7 @@ public class ProdutoController {
     }
 
     @PatchMapping("/{id}/vendido")
-    @PreAuthorize("hasRole('ARTESAO')")
+    @PreAuthorize("hasAuthority('ARTESAO')")
     public ResponseEntity<ProdutoResponse> marcarVendido(@PathVariable Long id) {
         return ResponseEntity.ok(produtoService.marcarVendido(id));
     }
@@ -103,7 +103,7 @@ public class ProdutoController {
     // ======================== IMAGENS ========================
 
     @PostMapping(value = "/{id}/imagens", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasRole('ARTESAO')")
+    @PreAuthorize("hasAuthority('ARTESAO')")
     public ResponseEntity<ProdutoResponse> uploadImagem(
             @PathVariable Long id,
             @RequestParam("arquivo") MultipartFile arquivo) {
@@ -112,7 +112,7 @@ public class ProdutoController {
     }
 
     @DeleteMapping("/{id}/imagens/{imagemId}")
-    @PreAuthorize("hasRole('ARTESAO')")
+    @PreAuthorize("hasAuthority('ARTESAO')")
     public ResponseEntity<ProdutoResponse> removerImagem(
             @PathVariable Long id,
             @PathVariable Long imagemId) {

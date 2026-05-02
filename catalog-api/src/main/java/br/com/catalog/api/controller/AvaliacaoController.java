@@ -21,7 +21,7 @@ public class AvaliacaoController {
     private final AvaliacaoService avaliacaoService;
 
     @PostMapping
-    @PreAuthorize("hasRole('COMPRADOR')")
+    @PreAuthorize("hasAuthority('COMPRADOR')")
     public ResponseEntity<AvaliacaoResponse> avaliarProduto(
             @PathVariable Long produtoId,
             @RequestBody @Valid AvaliacaoRequest request) {

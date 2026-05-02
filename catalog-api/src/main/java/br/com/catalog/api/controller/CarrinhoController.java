@@ -13,7 +13,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/carrinho")
-@PreAuthorize("hasRole('COMPRADOR')")
+@PreAuthorize("hasAuthority('COMPRADOR')")
 @RequiredArgsConstructor
 public class CarrinhoController {
 

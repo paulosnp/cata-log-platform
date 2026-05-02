@@ -44,12 +44,12 @@ public class AuthService {
         }
 
         String token = jwtService.generateToken(
-                artesao.getEmail(), "ROLE_ARTESAO", artesao.getId()
+                artesao.getEmail(), "ARTESAO", artesao.getId()
         );
 
         return LoginResponse.builder()
                 .token(token)
-                .role("ROLE_ARTESAO")
+                .role("ARTESAO")
                 .nome(artesao.getNomeAtelie())
                 .senhaTemporaria(Boolean.TRUE.equals(artesao.getSenhaTemporaria()))
                 .build();
@@ -67,12 +67,12 @@ public class AuthService {
         }
 
         String token = jwtService.generateToken(
-                comprador.getEmail(), "ROLE_COMPRADOR", comprador.getId()
+                comprador.getEmail(), "COMPRADOR", comprador.getId()
         );
 
         return LoginResponse.builder()
                 .token(token)
-                .role("ROLE_COMPRADOR")
+                .role("COMPRADOR")
                 .nome(comprador.getNome())
                 .senhaTemporaria(false)
                 .build();
@@ -85,13 +85,13 @@ public class AuthService {
         validarSenha(request.getSenha(), admin.getSenha());
 
         String token = jwtService.generateToken(
-                admin.getEmail(), "ROLE_ADMIN", admin.getId()
+                admin.getEmail(), "ADMIN", admin.getId()
         );
 
         // RN-02: Flag para o frontend interceptar e forçar troca de senha no primeiro acesso
         return LoginResponse.builder()
                 .token(token)
-                .role("ROLE_ADMIN")
+                .role("ADMIN")
                 .nome(admin.getEmail())
                 .senhaTemporaria(Boolean.TRUE.equals(admin.getSenhaTemporaria()))
                 .build();

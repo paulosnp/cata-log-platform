@@ -36,21 +36,21 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (comprador.isPresent()) {
             Comprador c = comprador.get();
             return new User(c.getEmail(), c.getSenha(),
-                    List.of(new SimpleGrantedAuthority("ROLE_COMPRADOR")));
+                    List.of(new SimpleGrantedAuthority("COMPRADOR")));
         }
 
         Optional<Artesao> artesao = artesaoRepository.findByEmail(email);
         if (artesao.isPresent()) {
             Artesao a = artesao.get();
             return new User(a.getEmail(), a.getSenha(),
-                    List.of(new SimpleGrantedAuthority("ROLE_ARTESAO")));
+                    List.of(new SimpleGrantedAuthority("ARTESAO")));
         }
 
         Optional<Admin> admin = adminRepository.findByEmail(email);
         if (admin.isPresent()) {
             Admin adm = admin.get();
             return new User(adm.getEmail(), adm.getSenha(),
-                    List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
+                    List.of(new SimpleGrantedAuthority("ADMIN")));
         }
 
         throw new UsernameNotFoundException("Usuário não encontrado: " + email);
