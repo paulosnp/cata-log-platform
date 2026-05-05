@@ -1,8 +1,10 @@
 package br.com.catalog.api.service;
 
 import br.com.catalog.api.dto.admin.ArtesaoAdminResponse;
+import br.com.catalog.api.dto.admin.CompradorAdminResponse;
 import br.com.catalog.api.dto.admin.DashboardResponse;
 import br.com.catalog.api.model.Artesao;
+import br.com.catalog.api.model.Comprador;
 import br.com.catalog.api.repository.ArtesaoRepository;
 import br.com.catalog.api.repository.CompradorRepository;
 import br.com.catalog.api.repository.PedidoRepository;
@@ -70,6 +72,48 @@ public class AdminService {
                 .seloVerificado(a.getSeloVerificado())
                 .ativo(a.getAtivo())
                 .criadoEm(a.getCriadoEm())
+                .build();
+    }
+
+    // ===================== GESTÃO DE COMPRADORES =====================
+
+    @Transactional(readOnly = true)
+    public Page<CompradorAdminResponse> listarTodosCompradores(Pageable pageable) {
+        return compradorRepository.findAll(pageable)
+                .map(this::toCompradorResponse);
+    }
+
+    @Transactional
+    public CompradorAdminResponse bloquearComprador(Long id) {
+        Comprador comprador = buscarComprador(id);
+        comprador.setAtivo(false);
+        Comprador salvo = compradorRepository.save(comprador);
+        return toCompradorResponse(salvo);
+    }
+
+    @Transactional
+    public CompradorAdminResponse desbloquearComprador(Long id) {
+        Comprador comprador = buscarComprador(id);
+        comprador.setAtivo(true);
+        Comprador salvo = compradorRepository.save(comprador);
+        return toCompradorResponse(salvo);
+    }
+
+    private Comprador buscarComprador(Long id) {
+        return compradorRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Comprador não encontrado com ID: " + id));
+    }
+
+    private CompradorAdminResponse toCompradorResponse(Comprador c) {
+        return CompradorAdminResponse.builder()
+                .id(c.getId())
+                .nome(c.getNome())
+                .email(c.getEmail())
+                .cpf(c.getCpf())
+                .cidade(c.getCidade())
+                .estado(c.getEstado())
+                .ativo(c.getAtivo())
+                .criadoEm(c.getCriadoEm())
                 .build();
     }
 }

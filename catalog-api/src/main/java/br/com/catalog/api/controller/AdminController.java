@@ -2,6 +2,7 @@ package br.com.catalog.api.controller;
 
 import br.com.catalog.api.dto.AdminRegistroRequest;
 import br.com.catalog.api.dto.admin.ArtesaoAdminResponse;
+import br.com.catalog.api.dto.admin.CompradorAdminResponse;
 import br.com.catalog.api.dto.admin.DashboardResponse;
 import br.com.catalog.api.service.AdminService;
 import br.com.catalog.api.service.RegistroService;
@@ -32,10 +33,14 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.CREATED).body(resposta);
     }
 
+    // ===================== DASHBOARD =====================
+
     @GetMapping("/dashboard")
     public ResponseEntity<DashboardResponse> obterDashboard() {
         return ResponseEntity.ok(adminService.obterMetricasDashboard());
     }
+
+    // ===================== GESTÃO DE ARTESÃOS =====================
 
     @GetMapping("/artesaos")
     public ResponseEntity<Page<ArtesaoAdminResponse>> listarArtesaos(
@@ -51,5 +56,23 @@ public class AdminController {
     @PutMapping("/artesaos/{id}/remover-verificacao")
     public ResponseEntity<ArtesaoAdminResponse> removerVerificacao(@PathVariable Long id) {
         return ResponseEntity.ok(adminService.removerVerificacao(id));
+    }
+
+    // ===================== GESTÃO DE COMPRADORES =====================
+
+    @GetMapping("/compradores")
+    public ResponseEntity<Page<CompradorAdminResponse>> listarCompradores(
+            @PageableDefault(size = 20) Pageable pageable) {
+        return ResponseEntity.ok(adminService.listarTodosCompradores(pageable));
+    }
+
+    @PutMapping("/compradores/{id}/bloquear")
+    public ResponseEntity<CompradorAdminResponse> bloquearComprador(@PathVariable Long id) {
+        return ResponseEntity.ok(adminService.bloquearComprador(id));
+    }
+
+    @PutMapping("/compradores/{id}/desbloquear")
+    public ResponseEntity<CompradorAdminResponse> desbloquearComprador(@PathVariable Long id) {
+        return ResponseEntity.ok(adminService.desbloquearComprador(id));
     }
 }
