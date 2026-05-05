@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
-import java.util.Date;
+import java.util.*;
 import java.util.function.Function;
 
 @Service
@@ -21,10 +21,15 @@ public class JwtService {
     private long expiration;
 
     public String generateToken(String email, String role, Long userId) {
+        return generateToken(email, role, userId, Collections.emptyList());
+    }
+
+    public String generateToken(String email, String role, Long userId, List<String> permissions) {
         return Jwts.builder()
                 .subject(email)
                 .claim("role", role)
                 .claim("userId", userId)
+                .claim("permissions", permissions)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey())
@@ -41,6 +46,17 @@ public class JwtService {
 
     public Long extractUserId(String token) {
         return extractClaim(token, claims -> claims.get("userId", Long.class));
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<String> extractPermissions(String token) {
+        return extractClaim(token, claims -> {
+            Object perms = claims.get("permissions");
+            if (perms instanceof List) {
+                return (List<String>) perms;
+            }
+            return Collections.emptyList();
+        });
     }
 
     public boolean isTokenValid(String token) {

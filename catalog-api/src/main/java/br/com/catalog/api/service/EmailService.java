@@ -40,4 +40,26 @@ public class EmailService {
             log.error("Erro ao enviar email de verificação para {}: {}", destinatario, e.getMessage());
         }
     }
+
+    public void enviarPinRecuperacao(String destinatario, String pin) {
+        try {
+            SimpleMailMessage mensagem = new SimpleMailMessage();
+            mensagem.setFrom(remetente);
+            mensagem.setTo(destinatario);
+            mensagem.setSubject("🔐 Código de Recuperação de Senha — Cata Log");
+            mensagem.setText(
+                    "Olá,\n\n" +
+                    "Recebemos uma solicitação para redefinir a sua senha no Cata Log.\n\n" +
+                    "Seu código de recuperação: " + pin + "\n\n" +
+                    "Este código é válido por 15 minutos.\n" +
+                    "Se você não solicitou esta redefinição, ignore este email.\n\n" +
+                    "Equipa Cata Log"
+            );
+
+            mailSender.send(mensagem);
+            log.info("Email de recuperação de senha enviado para: {}", destinatario);
+        } catch (Exception e) {
+            log.error("Erro ao enviar email de recuperação para {}: {}", destinatario, e.getMessage());
+        }
+    }
 }

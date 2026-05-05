@@ -1,6 +1,7 @@
 package br.com.catalog.api.service;
 
 import br.com.catalog.api.dto.*;
+import br.com.catalog.api.event.RecuperacaoSenhaEvent;
 import br.com.catalog.api.exception.CodigoRecuperacaoInvalidoException;
 import br.com.catalog.api.exception.ContaBloqueadaException;
 import br.com.catalog.api.exception.CredenciaisInvalidasException;
@@ -12,11 +13,13 @@ import br.com.catalog.api.repository.ArtesaoRepository;
 import br.com.catalog.api.repository.CompradorRepository;
 import br.com.catalog.api.security.JwtService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
@@ -29,6 +32,7 @@ public class AuthService {
     private final AdminRepository adminRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final ApplicationEventPublisher eventPublisher;
 
     // ======================== LOGIN ========================
 
@@ -84,8 +88,12 @@ public class AuthService {
 
         validarSenha(request.getSenha(), admin.getSenha());
 
+        List<String> permissions = admin.getPermissoes().stream()
+                .map(Enum::name)
+                .toList();
+
         String token = jwtService.generateToken(
-                admin.getEmail(), "ADMIN", admin.getId()
+                admin.getEmail(), "ADMIN", admin.getId(), permissions
         );
 
         // RN-02: Flag para o frontend interceptar e forçar troca de senha no primeiro acesso
@@ -148,7 +156,7 @@ public class AuthService {
             artesao.setCodigoRecuperacao(pin);
             artesao.setValidadeCodigo(validade);
             artesaoRepository.save(artesao);
-            enviarPinConsole(email, pin);
+            eventPublisher.publishEvent(new RecuperacaoSenhaEvent(email, pin));
             return;
         }
 
@@ -157,7 +165,7 @@ public class AuthService {
             Comprador comprador = compradorOpt.get();
             comprador.setCodigoVerificacao(pin);
             compradorRepository.save(comprador);
-            enviarPinConsole(email, pin);
+            eventPublisher.publishEvent(new RecuperacaoSenhaEvent(email, pin));
             return;
         }
 
@@ -212,12 +220,4 @@ public class AuthService {
         return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 
-    private void enviarPinConsole(String email, String pin) {
-        System.out.println("==================================================");
-        System.out.println("📧 E-MAIL MOCK — RECUPERAÇÃO DE SENHA");
-        System.out.println("Para: " + email);
-        System.out.println("Seu PIN de recuperação: " + pin);
-        System.out.println("Validade: 15 minutos");
-        System.out.println("==================================================");
-    }
 }

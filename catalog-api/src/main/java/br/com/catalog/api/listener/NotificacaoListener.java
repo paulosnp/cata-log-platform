@@ -1,6 +1,7 @@
 package br.com.catalog.api.listener;
 
 import br.com.catalog.api.event.ArtesaoVerificadoEvent;
+import br.com.catalog.api.event.RecuperacaoSenhaEvent;
 import br.com.catalog.api.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,5 +23,13 @@ public class NotificacaoListener {
                 evento.getNomeAtelie(), evento.getEmail());
 
         emailService.enviarEmailVerificacao(evento.getEmail(), evento.getNomeAtelie());
+    }
+
+    @Async
+    @EventListener
+    public void onRecuperacaoSenha(RecuperacaoSenhaEvent evento) {
+        log.info("Evento recebido: Recuperação de senha solicitada para: {}", evento.getEmail());
+
+        emailService.enviarPinRecuperacao(evento.getEmail(), evento.getPin());
     }
 }

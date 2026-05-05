@@ -7,6 +7,7 @@ import br.com.catalog.api.exception.EmailJaCadastradoException;
 import br.com.catalog.api.model.Admin;
 import br.com.catalog.api.model.Artesao;
 import br.com.catalog.api.model.Comprador;
+import br.com.catalog.api.model.enums.PermissaoAdmin;
 import br.com.catalog.api.repository.AdminRepository;
 import br.com.catalog.api.repository.ArtesaoRepository;
 import br.com.catalog.api.repository.CompradorRepository;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.EnumSet;
 import java.util.Map;
 import java.util.UUID;
 
@@ -61,6 +63,7 @@ public class RegistroService {
         Admin admin = Admin.builder()
                 .email(request.getEmail())
                 .senha(passwordEncoder.encode(senhaTemporariaStr))
+                .permissoes(EnumSet.of(PermissaoAdmin.VER_DASHBOARD))
                 .build();
 
         adminRepository.save(admin);

@@ -1,13 +1,17 @@
 package br.com.catalog.api.service;
 
+import br.com.catalog.api.dto.admin.AdminResponse;
 import br.com.catalog.api.dto.admin.ArtesaoAdminResponse;
 import br.com.catalog.api.dto.admin.CompradorAdminResponse;
 import br.com.catalog.api.dto.admin.DashboardResponse;
 import br.com.catalog.api.dto.admin.FaturamentoResponse;
 import br.com.catalog.api.dto.admin.TopArtesaoResponse;
 import br.com.catalog.api.event.ArtesaoVerificadoEvent;
+import br.com.catalog.api.model.Admin;
 import br.com.catalog.api.model.Artesao;
 import br.com.catalog.api.model.Comprador;
+import br.com.catalog.api.model.enums.PermissaoAdmin;
+import br.com.catalog.api.repository.AdminRepository;
 import br.com.catalog.api.repository.ArtesaoRepository;
 import br.com.catalog.api.repository.CompradorRepository;
 import br.com.catalog.api.repository.PedidoRepository;
@@ -17,12 +21,14 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,6 +39,7 @@ public class AdminService {
     private final CompradorRepository compradorRepository;
     private final ProdutoRepository produtoRepository;
     private final PedidoRepository pedidoRepository;
+    private final AdminRepository adminRepository;
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional(readOnly = true)
@@ -160,5 +167,56 @@ public class AdminService {
                         .quantidadePedidos((Long) row[3])
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    // ===================== GESTÃO DE ADMINS =====================
+
+    @Transactional(readOnly = true)
+    public List<AdminResponse> listarTodosAdmins() {
+        return adminRepository.findAll().stream()
+                .map(this::toAdminResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public AdminResponse atualizarPermissoes(Long adminId, Set<PermissaoAdmin> novasPermissoes) {
+        // RN-15.1: Admin não pode alterar suas próprias permissões
+        String emailLogado = SecurityContextHolder.getContext().getAuthentication().getName();
+        Admin admin = adminRepository.findById(adminId)
+                .orElseThrow(() -> new IllegalArgumentException("Admin não encontrado com ID: " + adminId));
+
+        if (admin.getEmail().equals(emailLogado)) {
+            throw new IllegalArgumentException("Você não pode alterar suas próprias permissões.");
+        }
+
+        // RN-15.2: Garantir que pelo menos 1 admin mantenha GERENCIAR_ADMINS
+        boolean alvoTinhaGerenciarAdmins = admin.getPermissoes().contains(PermissaoAdmin.GERENCIAR_ADMINS);
+        boolean novasNaoTemGerenciarAdmins = !novasPermissoes.contains(PermissaoAdmin.GERENCIAR_ADMINS);
+
+        if (alvoTinhaGerenciarAdmins && novasNaoTemGerenciarAdmins) {
+            long totalComGerenciarAdmins = adminRepository.findAll().stream()
+                    .filter(a -> a.getPermissoes().contains(PermissaoAdmin.GERENCIAR_ADMINS))
+                    .count();
+
+            if (totalComGerenciarAdmins <= 1) {
+                throw new IllegalArgumentException(
+                        "Operação negada. Este é o último admin com permissão GERENCIAR_ADMINS.");
+            }
+        }
+
+        admin.getPermissoes().clear();
+        admin.getPermissoes().addAll(novasPermissoes);
+        Admin salvo = adminRepository.save(admin);
+        return toAdminResponse(salvo);
+    }
+
+    private AdminResponse toAdminResponse(Admin a) {
+        return AdminResponse.builder()
+                .id(a.getId())
+                .email(a.getEmail())
+                .senhaTemporaria(a.getSenhaTemporaria())
+                .permissoes(a.getPermissoes())
+                .criadoEm(a.getCriadoEm())
+                .build();
     }
 }
