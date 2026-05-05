@@ -5,6 +5,7 @@ import br.com.catalog.api.dto.admin.CompradorAdminResponse;
 import br.com.catalog.api.dto.admin.DashboardResponse;
 import br.com.catalog.api.dto.admin.FaturamentoResponse;
 import br.com.catalog.api.dto.admin.TopArtesaoResponse;
+import br.com.catalog.api.event.ArtesaoVerificadoEvent;
 import br.com.catalog.api.model.Artesao;
 import br.com.catalog.api.model.Comprador;
 import br.com.catalog.api.repository.ArtesaoRepository;
@@ -12,6 +13,7 @@ import br.com.catalog.api.repository.CompradorRepository;
 import br.com.catalog.api.repository.PedidoRepository;
 import br.com.catalog.api.repository.ProdutoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +33,7 @@ public class AdminService {
     private final CompradorRepository compradorRepository;
     private final ProdutoRepository produtoRepository;
     private final PedidoRepository pedidoRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional(readOnly = true)
     public DashboardResponse obterMetricasDashboard() {
@@ -53,6 +56,11 @@ public class AdminService {
         Artesao artesao = buscarArtesao(id);
         artesao.setSeloVerificado(true);
         Artesao salvo = artesaoRepository.save(artesao);
+
+        eventPublisher.publishEvent(
+                new ArtesaoVerificadoEvent(salvo.getEmail(), salvo.getNomeAtelie())
+        );
+
         return toAdminResponse(salvo);
     }
 

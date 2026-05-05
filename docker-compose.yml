@@ -32,6 +32,11 @@ services:
       SERVER_PORT: 8080
       STREAM_CHAT_API_KEY: ${STREAM_CHAT_API_KEY}
       STREAM_CHAT_API_SECRET: ${STREAM_CHAT_API_SECRET}
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      MAIL_FROM: ${MAIL_FROM}
       TZ: America/Sao_Paulo
     volumes:
       - catalog_uploads:/app/uploads
