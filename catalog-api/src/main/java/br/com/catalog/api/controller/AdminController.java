@@ -4,6 +4,8 @@ import br.com.catalog.api.dto.AdminRegistroRequest;
 import br.com.catalog.api.dto.admin.ArtesaoAdminResponse;
 import br.com.catalog.api.dto.admin.CompradorAdminResponse;
 import br.com.catalog.api.dto.admin.DashboardResponse;
+import br.com.catalog.api.dto.admin.FaturamentoResponse;
+import br.com.catalog.api.dto.admin.TopArtesaoResponse;
 import br.com.catalog.api.service.AdminService;
 import br.com.catalog.api.service.RegistroService;
 import jakarta.validation.Valid;
@@ -16,8 +18,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
+import org.springframework.format.annotation.DateTimeFormat;
 @RestController
 @RequestMapping("/api/v1/admin")
 @PreAuthorize("hasAuthority('ADMIN')")
@@ -74,5 +79,22 @@ public class AdminController {
     @PutMapping("/compradores/{id}/desbloquear")
     public ResponseEntity<CompradorAdminResponse> desbloquearComprador(@PathVariable Long id) {
         return ResponseEntity.ok(adminService.desbloquearComprador(id));
+    }
+
+    // ===================== RELATÓRIOS =====================
+
+    @GetMapping("/relatorios/faturamento")
+    public ResponseEntity<FaturamentoResponse> obterFaturamento(
+            @RequestParam String inicio,
+            @RequestParam String fim) {
+        LocalDateTime dataInicio = LocalDateTime.parse(inicio);
+        LocalDateTime dataFim = LocalDateTime.parse(fim);
+        return ResponseEntity.ok(adminService.calcularFaturamento(dataInicio, dataFim));
+    }
+
+    @GetMapping("/relatorios/top-artesaos")
+    public ResponseEntity<List<TopArtesaoResponse>> obterTopArtesaos(
+            @RequestParam(defaultValue = "5") int limite) {
+        return ResponseEntity.ok(adminService.obterTopArtesaos(limite));
     }
 }

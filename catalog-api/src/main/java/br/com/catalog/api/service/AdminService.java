@@ -3,6 +3,8 @@ package br.com.catalog.api.service;
 import br.com.catalog.api.dto.admin.ArtesaoAdminResponse;
 import br.com.catalog.api.dto.admin.CompradorAdminResponse;
 import br.com.catalog.api.dto.admin.DashboardResponse;
+import br.com.catalog.api.dto.admin.FaturamentoResponse;
+import br.com.catalog.api.dto.admin.TopArtesaoResponse;
 import br.com.catalog.api.model.Artesao;
 import br.com.catalog.api.model.Comprador;
 import br.com.catalog.api.repository.ArtesaoRepository;
@@ -11,9 +13,15 @@ import br.com.catalog.api.repository.PedidoRepository;
 import br.com.catalog.api.repository.ProdutoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -115,5 +123,34 @@ public class AdminService {
                 .ativo(c.getAtivo())
                 .criadoEm(c.getCriadoEm())
                 .build();
+    }
+
+    // ===================== RELATÓRIOS =====================
+
+    @Transactional(readOnly = true)
+    public FaturamentoResponse calcularFaturamento(LocalDateTime inicio, LocalDateTime fim) {
+        BigDecimal totalFaturamento = pedidoRepository.somarFaturamentoPorPeriodo(inicio, fim);
+        BigDecimal taxaPlataforma = pedidoRepository.somarTaxaPlataformaPorPeriodo(inicio, fim);
+        Long totalPedidos = pedidoRepository.contarPedidosAprovadosPorPeriodo(inicio, fim);
+
+        return FaturamentoResponse.builder()
+                .totalFaturamento(totalFaturamento != null ? totalFaturamento : BigDecimal.ZERO)
+                .taxaPlataforma(taxaPlataforma != null ? taxaPlataforma : BigDecimal.ZERO)
+                .totalPedidos(totalPedidos != null ? totalPedidos : 0L)
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public List<TopArtesaoResponse> obterTopArtesaos(int limite) {
+        List<Object[]> resultados = pedidoRepository.buscarTopArtesaosPorVendas(PageRequest.of(0, limite));
+
+        return resultados.stream()
+                .map(row -> TopArtesaoResponse.builder()
+                        .artesaoId((Long) row[0])
+                        .nomeArtesao((String) row[1])
+                        .totalVendido((BigDecimal) row[2])
+                        .quantidadePedidos((Long) row[3])
+                        .build())
+                .collect(Collectors.toList());
     }
 }
