@@ -7,6 +7,7 @@ import br.com.catalog.api.dto.logistica.OpcaoFreteResponse;
 import br.com.catalog.api.model.Artesao;
 import br.com.catalog.api.model.Pedido;
 import br.com.catalog.api.model.enums.StatusEntrega;
+import br.com.catalog.api.repository.ArtesaoRepository;
 import br.com.catalog.api.repository.PedidoRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -28,6 +30,7 @@ public class LogisticaService {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
     private final PedidoRepository pedidoRepository;
+    private final ArtesaoRepository artesaoRepository;
 
     @Value("${melhorenvio.token:}")
     private String melhorEnvioToken;
@@ -64,7 +67,8 @@ public class LogisticaService {
 
     // ======================== ENVIO COMPLETO (Sprint 17.1) ========================
 
-    public GerarEnvioResponse gerarEnvioCompleto(GerarEnvioRequest request, Artesao artesao) {
+    public GerarEnvioResponse gerarEnvioCompleto(GerarEnvioRequest request) {
+        Artesao artesao = getArtesaoLogado();
         Pedido pedido = pedidoRepository.findById(request.getPedidoId())
                 .orElseThrow(() -> new IllegalArgumentException("Pedido não encontrado com ID: " + request.getPedidoId()));
 
@@ -300,5 +304,11 @@ public class LogisticaService {
 
     private String limparCep(String cep) {
         return cep != null ? cep.replaceAll("[^0-9]", "") : "";
+    }
+
+    private Artesao getArtesaoLogado() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return artesaoRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Artesão não encontrado."));
     }
 }

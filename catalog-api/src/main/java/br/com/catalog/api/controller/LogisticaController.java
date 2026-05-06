@@ -4,14 +4,11 @@ import br.com.catalog.api.dto.logistica.CotacaoFreteRequest;
 import br.com.catalog.api.dto.logistica.GerarEnvioRequest;
 import br.com.catalog.api.dto.logistica.GerarEnvioResponse;
 import br.com.catalog.api.dto.logistica.OpcaoFreteResponse;
-import br.com.catalog.api.model.Artesao;
-import br.com.catalog.api.repository.ArtesaoRepository;
 import br.com.catalog.api.service.LogisticaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,7 +19,6 @@ import java.util.List;
 public class LogisticaController {
 
     private final LogisticaService logisticaService;
-    private final ArtesaoRepository artesaoRepository;
 
     @PostMapping("/cotacao")
     @PreAuthorize("hasAuthority('COMPRADOR') or hasAuthority('ARTESAO')")
@@ -36,14 +32,7 @@ public class LogisticaController {
     @PreAuthorize("hasAuthority('ARTESAO')")
     public ResponseEntity<GerarEnvioResponse> gerarEnvio(
             @RequestBody @Valid GerarEnvioRequest request) {
-        Artesao artesao = getArtesaoLogado();
-        GerarEnvioResponse response = logisticaService.gerarEnvioCompleto(request, artesao);
+        GerarEnvioResponse response = logisticaService.gerarEnvioCompleto(request);
         return ResponseEntity.ok(response);
-    }
-
-    private Artesao getArtesaoLogado() {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        return artesaoRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("Artesão não encontrado."));
     }
 }
