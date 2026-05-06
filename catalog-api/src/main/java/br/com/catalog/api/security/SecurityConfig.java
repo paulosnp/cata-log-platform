@@ -48,6 +48,9 @@ public class SecurityConfig {
                         // Imagens estáticas dos produtos (Sprint 6)
                         .requestMatchers("/imagens/**").permitAll()
 
+                        // Webhooks — chamados por servidores externos sem JWT (Sprint 16)
+                        .requestMatchers("/api/v1/webhooks/**").permitAll()
+
                         // Swagger / OpenAPI (RNF-DOC01)
                         .requestMatchers(
                                 "/swagger-ui/**",

@@ -37,6 +37,8 @@ services:
       MAIL_USERNAME: ${MAIL_USERNAME}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       MAIL_FROM: ${MAIL_FROM}
+      MERCADOPAGO_ACCESS_TOKEN: ${MERCADOPAGO_ACCESS_TOKEN}
+      MELHORENVIO_TOKEN: ${MELHORENVIO_TOKEN}
       TZ: America/Sao_Paulo
     volumes:
       - catalog_uploads:/app/uploads
