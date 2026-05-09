@@ -32,7 +32,7 @@ export default function HomePage() {
           {/* CTA */}
           <div className="mt-10 flex flex-col gap-4 sm:flex-row">
             <Link
-              to="/"
+              to="/vitrine"
               className="gradient-primary inline-flex items-center gap-2 rounded-md px-8 py-3.5 text-sm font-semibold text-on-primary shadow-ambient transition-all hover:shadow-hover hover:scale-[1.02]"
             >
               Explorar Vitrine
@@ -114,7 +114,7 @@ export default function HomePage() {
             diretamente quem faz arte com as mãos.
           </p>
           <Link
-            to="/"
+            to="/vitrine"
             className="gradient-primary mt-10 inline-flex items-center gap-2 rounded-md px-8 py-3.5 text-sm font-semibold text-on-primary shadow-ambient transition-all hover:shadow-hover hover:scale-[1.02]"
           >
             Ver Vitrine Completa

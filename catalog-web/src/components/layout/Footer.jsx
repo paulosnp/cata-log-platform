@@ -29,7 +29,7 @@ export default function Footer() {
             <ul className="flex flex-col gap-2.5">
               <li>
                 <Link
-                  to="/"
+                  to="/vitrine"
                   className="text-sm text-inverse-on-surface/70 transition-colors hover:text-inverse-primary"
                 >
                   Vitrine

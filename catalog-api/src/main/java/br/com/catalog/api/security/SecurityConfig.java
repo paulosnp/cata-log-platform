@@ -86,7 +86,11 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(
                 "http://localhost:3000",
-                "http://localhost:3001"
+                "http://localhost:3001",
+                "https://prismcode.site",
+                "http://prismcode.site",
+                "https://www.prismcode.site",
+                "http://www.prismcode.site"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type"));

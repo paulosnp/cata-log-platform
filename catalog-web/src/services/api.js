@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8080/api/v1';
+// Em produção: path relativo /api/v1 (Nginx proxy reverso, mesmo domínio = sem CORS)
+// Em dev: http://localhost:8080/api/v1 (acesso direto ao Spring Boot)
+const API_BASE_URL = import.meta.env.VITE_API_URL
+  || (import.meta.env.PROD ? '/api/v1' : 'http://localhost:8080/api/v1');
 
 const api = axios.create({
   baseURL: API_BASE_URL,
