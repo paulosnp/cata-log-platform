@@ -35,6 +35,7 @@ logs/
 # Variáveis de Ambiente e Segredos
 .env
 *.env.local
+docs/
 
 # Profiles Spring Boot com credenciais reais
 application-dev.properties
