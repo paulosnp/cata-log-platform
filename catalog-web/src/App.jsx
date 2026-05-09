@@ -13,6 +13,11 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ProductPage from './pages/ProductPage';
 import CartPage from './pages/CartPage';
 import WishlistPage from './pages/WishlistPage';
+import CheckoutPage from './pages/checkout/CheckoutPage';
+import PaymentSuccessPage from './pages/checkout/PaymentSuccessPage';
+import PaymentFailurePage from './pages/checkout/PaymentFailurePage';
+import PaymentPendingPage from './pages/checkout/PaymentPendingPage';
+import OrdersPage from './pages/OrdersPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 export default function App() {
@@ -33,9 +38,16 @@ export default function App() {
                   <Route path="esqueci-senha" element={<ForgotPasswordPage />} />
                   <Route path="carrinho" element={<CartPage />} />
 
+                  {/* ── Feedback de Pagamento (públicas — MP redireciona aqui) ── */}
+                  <Route path="pagamento/sucesso" element={<PaymentSuccessPage />} />
+                  <Route path="pagamento/falha" element={<PaymentFailurePage />} />
+                  <Route path="pagamento/pendente" element={<PaymentPendingPage />} />
+
                   {/* ── Rotas Protegidas ── */}
                   <Route element={<PrivateRoute />}>
                     <Route path="desejos" element={<WishlistPage />} />
+                    <Route path="checkout" element={<CheckoutPage />} />
+                    <Route path="pedidos" element={<OrdersPage />} />
                   </Route>
 
                   {/* ── Catch-all ── */}

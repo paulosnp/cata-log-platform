@@ -8,6 +8,10 @@ docker-compose.override.yml
 # Documentação interna de Sprints (planos e relatórios)
 Sprint *.md
 Cata Log Documento de Requisitos V7.md
+docs/
+
+# Migração de teste local (não subir para produção)
+**/V18__seed_test_data.sql
 
 # Node.js
 node_modules/

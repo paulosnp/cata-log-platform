@@ -45,11 +45,13 @@ public class ProdutoService {
 
     // ======================== VITRINE PÚBLICA ========================
 
+    @Transactional(readOnly = true)
     public Page<ProdutoResponse> listarVitrine(Pageable pageable) {
         return produtoRepository.findAllAtivosVitrine(pageable)
                 .map(this::toResponse);
     }
 
+    @Transactional(readOnly = true)
     public Page<ProdutoResponse> buscarVitrine(String termo, Long categoriaId,
                                                BigDecimal precoMin, BigDecimal precoMax,
                                                Pageable pageable) {
@@ -71,11 +73,13 @@ public class ProdutoService {
         return produtoRepository.findAll(spec, pageable).map(this::toResponse);
     }
 
+    @Transactional(readOnly = true)
     public Page<ProdutoResponse> listarVitrinePorCategoria(Long categoriaId, Pageable pageable) {
         return produtoRepository.findAllAtivosVitrineByCategoriaId(categoriaId, pageable)
                 .map(this::toResponse);
     }
 
+    @Transactional(readOnly = true)
     public ProdutoResponse buscarPorId(Long id) {
         Produto produto = buscarProdutoAtivo(id);
         return toResponse(produto);
@@ -83,6 +87,7 @@ public class ProdutoService {
 
     // ======================== ARTESÃO LOGADO ========================
 
+    @Transactional(readOnly = true)
     public Page<ProdutoResponse> listarMeusProdutos(Pageable pageable) {
         Long artesaoId = securityUtils.getUsuarioLogadoId();
         return produtoRepository.findByArtesaoId(artesaoId, pageable)
