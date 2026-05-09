@@ -1,5 +1,8 @@
-import { Link } from 'react-router-dom';
-import { Percent, Gem, Star, BadgeCheck, ImageOff } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Percent, Gem, Star, BadgeCheck, ImageOff, Heart } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
+import { useWishlist } from '../../contexts/WishlistContext';
+import { useToast } from './Toast';
 
 /**
  * Formata um valor numérico para moeda brasileira (BRL).
@@ -12,11 +15,16 @@ const formatPrice = (value) =>
  *
  * Exibe: imagem (ou placeholder), nome, categoria, preço formatado BRL,
  * badges condicionais (promoção, peça única), selo artesão verificado,
- * avaliação com estrela, e overlay de "VENDIDO" quando aplicável.
+ * avaliação com estrela, overlay de "VENDIDO" e botão ❤️ wishlist.
  *
  * @param {{ produto: ProdutoResponse }} props
  */
 export default function ProductCard({ produto }) {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  const { isWishlisted, toggleWishlist } = useWishlist();
+  const { addToast } = useToast();
+
   const {
     id,
     nome,
@@ -36,6 +44,27 @@ export default function ProductCard({ produto }) {
 
   // Primeira imagem do array ou null
   const imagemPrincipal = imagensUrls?.length > 0 ? imagensUrls[0] : null;
+  const wishlisted = isWishlisted(id);
+
+  const handleWishlistClick = async (e) => {
+    e.preventDefault(); // Evita navegação do Link pai
+    e.stopPropagation();
+
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
+    const result = await toggleWishlist(id);
+    if (result.success) {
+      addToast(
+        result.action === 'added' ? 'Adicionado aos favoritos!' : 'Removido dos favoritos.',
+        result.action === 'added' ? 'success' : 'info'
+      );
+    } else {
+      addToast(result.error, 'error');
+    }
+  };
 
   return (
     <Link
@@ -81,6 +110,22 @@ export default function ProductCard({ produto }) {
             </span>
           )}
         </div>
+
+        {/* ❤️ Botão Wishlist — canto superior-direito */}
+        <button
+          onClick={handleWishlistClick}
+          className={`absolute right-2.5 top-2.5 flex h-8 w-8 items-center justify-center rounded-full backdrop-blur-sm transition-all duration-200 hover:scale-110 ${
+            wishlisted
+              ? 'bg-tertiary/90 text-white'
+              : 'bg-surface-container-lowest/80 text-on-surface-variant hover:text-tertiary'
+          }`}
+          aria-label={wishlisted ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+        >
+          <Heart
+            size={16}
+            fill={wishlisted ? 'currentColor' : 'none'}
+          />
+        </button>
       </div>
 
       {/* ── Informações ── */}

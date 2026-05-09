@@ -13,8 +13,13 @@ import {
   Layers,
   ImageOff,
   AlertTriangle,
+  Heart,
 } from 'lucide-react';
 import { productService } from '../services/productService';
+import { useAuth } from '../contexts/AuthContext';
+import { useCart } from '../contexts/CartContext';
+import { useWishlist } from '../contexts/WishlistContext';
+import { useToast } from '../components/common/Toast';
 import Spinner from '../components/common/Spinner';
 
 /**
@@ -40,10 +45,16 @@ export default function ProductPage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
+  const { isAuthenticated } = useAuth();
+  const { addToCart } = useCart();
+  const { isWishlisted, toggleWishlist } = useWishlist();
+  const { addToast } = useToast();
+
   const [produto, setProduto] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedImage, setSelectedImage] = useState(0);
+  const [addingToCart, setAddingToCart] = useState(false);
 
   // ── Carregar produto ao montar ou trocar de ID ──
   useEffect(() => {
@@ -122,6 +133,7 @@ export default function ProductPage() {
   // Imagens disponíveis
   const imagens = imagensUrls?.length > 0 ? imagensUrls : [];
   const imagemAtual = imagens[selectedImage] || null;
+  const wishlisted = isWishlisted(Number(id));
 
   // Ficha técnica (filtra campos não-nulos)
   const fichaTecnica = [
@@ -131,8 +143,40 @@ export default function ProductPage() {
     { icon: Clock, label: 'Tempo de produção', value: tempoProducaoDias ? `${tempoProducaoDias} dias` : null },
   ].filter((item) => item.value);
 
-  const handleAddToCart = () => {
-    console.log('Adicionar ao carrinho:', produto);
+  // ── Adicionar ao Carrinho ──
+  const handleAddToCart = async () => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
+    setAddingToCart(true);
+    const result = await addToCart(Number(id), 1);
+    setAddingToCart(false);
+
+    if (result.success) {
+      addToast('Adicionado ao carrinho!', 'success');
+    } else {
+      addToast(result.error, 'error');
+    }
+  };
+
+  // ── Toggle Wishlist ──
+  const handleWishlistToggle = async () => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
+    const result = await toggleWishlist(Number(id));
+    if (result.success) {
+      addToast(
+        result.action === 'added' ? 'Adicionado aos favoritos!' : 'Removido dos favoritos.',
+        result.action === 'added' ? 'success' : 'info'
+      );
+    } else {
+      addToast(result.error, 'error');
+    }
   };
 
   return (
@@ -188,6 +232,22 @@ export default function ProductPage() {
                 </span>
               )}
             </div>
+
+            {/* ❤️ Botão Wishlist — canto superior-direito */}
+            <button
+              onClick={handleWishlistToggle}
+              className={`absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-sm transition-all duration-200 hover:scale-110 ${
+                wishlisted
+                  ? 'bg-tertiary/90 text-white'
+                  : 'bg-surface-container-lowest/80 text-on-surface-variant hover:text-tertiary'
+              }`}
+              aria-label={wishlisted ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+            >
+              <Heart
+                size={20}
+                fill={wishlisted ? 'currentColor' : 'none'}
+              />
+            </button>
           </div>
 
           {/* Thumbnails (se mais de 1 imagem) */}
@@ -286,15 +346,38 @@ export default function ProductPage() {
             </div>
           )}
 
-          {/* Botão Adicionar ao Carrinho */}
-          <button
-            onClick={handleAddToCart}
-            disabled={vendido}
-            className="mt-8 flex items-center justify-center gap-2.5 rounded-lg bg-primary px-8 py-4 text-base font-semibold text-on-primary transition-all hover:bg-primary-dim hover:shadow-ambient disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <ShoppingCart size={20} />
-            {vendido ? 'Produto Vendido' : 'Adicionar ao Carrinho'}
-          </button>
+          {/* Botões de Ação */}
+          <div className="mt-8 flex gap-3">
+            {/* Adicionar ao Carrinho */}
+            <button
+              onClick={handleAddToCart}
+              disabled={vendido || addingToCart}
+              className="flex flex-1 items-center justify-center gap-2.5 rounded-lg bg-primary px-8 py-4 text-base font-semibold text-on-primary transition-all hover:bg-primary-dim hover:shadow-ambient disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {addingToCart ? (
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-on-primary border-t-transparent" />
+              ) : (
+                <ShoppingCart size={20} />
+              )}
+              {vendido ? 'Produto Vendido' : addingToCart ? 'Adicionando...' : 'Adicionar ao Carrinho'}
+            </button>
+
+            {/* Wishlist */}
+            <button
+              onClick={handleWishlistToggle}
+              className={`flex items-center justify-center rounded-lg border px-4 py-4 transition-all hover:scale-105 ${
+                wishlisted
+                  ? 'border-tertiary/30 bg-tertiary/10 text-tertiary'
+                  : 'border-outline-variant/20 text-on-surface-variant hover:border-tertiary hover:text-tertiary'
+              }`}
+              aria-label={wishlisted ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+            >
+              <Heart
+                size={20}
+                fill={wishlisted ? 'currentColor' : 'none'}
+              />
+            </button>
+          </div>
 
           {/* Ficha Técnica */}
           {fichaTecnica.length > 0 && (

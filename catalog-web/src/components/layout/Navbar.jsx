@@ -2,6 +2,7 @@ import { Search, ShoppingCart, Heart, User, Menu, X, LogOut, Package, ChevronDow
 import { Link, useNavigate } from 'react-router-dom';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useCart } from '../../contexts/CartContext';
 import { productService } from '../../services/productService';
 import logoSvg from '../../assets/logo.svg';
 
@@ -17,6 +18,7 @@ export default function Navbar() {
   const profileRef = useRef(null);
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
+  const { cartCount } = useCart();
 
   // ── Search State ──
   const [searchTerm, setSearchTerm] = useState('');
@@ -235,6 +237,11 @@ export default function Navbar() {
             aria-label="Carrinho"
           >
             <ShoppingCart size={20} />
+            {cartCount > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-tertiary px-1 text-[10px] font-bold text-on-tertiary">
+                {cartCount > 99 ? '99+' : cartCount}
+              </span>
+            )}
           </button>
 
           {/* Auth Section */}
@@ -376,6 +383,11 @@ export default function Navbar() {
             >
               <ShoppingCart size={18} />
               Carrinho
+              {cartCount > 0 && (
+                <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-tertiary px-1 text-[10px] font-bold text-on-tertiary">
+                  {cartCount > 99 ? '99+' : cartCount}
+                </span>
+              )}
             </Link>
 
             {isAuthenticated && (
