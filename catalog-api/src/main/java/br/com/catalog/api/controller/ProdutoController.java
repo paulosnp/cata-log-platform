@@ -34,8 +34,9 @@ public class ProdutoController {
             @RequestParam(required = false) Long categoriaId,
             @RequestParam(required = false) BigDecimal precoMin,
             @RequestParam(required = false) BigDecimal precoMax,
+            @RequestParam(required = false) Boolean emPromocao,
             @PageableDefault(size = 20) Pageable pageable) {
-        return ResponseEntity.ok(produtoService.buscarVitrine(termo, categoriaId, precoMin, precoMax, pageable));
+        return ResponseEntity.ok(produtoService.buscarVitrine(termo, categoriaId, precoMin, precoMax, emPromocao, pageable));
     }
 
     @GetMapping

@@ -45,6 +45,10 @@ public class ProdutoSpecification {
                 cb.lessThanOrEqualTo(root.get("preco"), precoMax);
     }
 
+    public static Specification<Produto> emPromocao() {
+        return (root, query, cb) -> cb.isTrue(root.get("emPromocao"));
+    }
+
     /**
      * Compõe a Specification base da vitrine (RN-04):
      * produto ativo + categoria ativa + artesão ativo + não vendido

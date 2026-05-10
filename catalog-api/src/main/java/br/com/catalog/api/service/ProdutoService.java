@@ -54,6 +54,7 @@ public class ProdutoService {
     @Transactional(readOnly = true)
     public Page<ProdutoResponse> buscarVitrine(String termo, Long categoriaId,
                                                BigDecimal precoMin, BigDecimal precoMax,
+                                               Boolean emPromocao,
                                                Pageable pageable) {
         Specification<Produto> spec = ProdutoSpecification.vitrineBase();
 
@@ -68,6 +69,9 @@ public class ProdutoService {
         }
         if (precoMax != null) {
             spec = spec.and(ProdutoSpecification.precoMaximo(precoMax));
+        }
+        if (Boolean.TRUE.equals(emPromocao)) {
+            spec = spec.and(ProdutoSpecification.emPromocao());
         }
 
         return produtoRepository.findAll(spec, pageable).map(this::toResponse);

@@ -9,6 +9,7 @@ docker-compose.override.yml
 Sprint *.md
 Cata Log Documento de Requisitos V7.md
 docs/
+Roadmap-Frontend-Vitrine-Parte2.md
 
 # Migração de teste local (não subir para produção)
 **/V18__seed_test_data.sql
