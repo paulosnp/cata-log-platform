@@ -16,6 +16,8 @@
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-router-dom": "^7.15.0",
+    "stream-chat": "^9.43.2",
+    "stream-chat-react": "^14.1.0",
     "tailwindcss": "^4.3.0"
   },
   "devDependencies": {

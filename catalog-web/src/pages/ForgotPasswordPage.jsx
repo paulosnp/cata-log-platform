@@ -130,7 +130,7 @@ export default function ForgotPasswordPage() {
     }
   };
 
-  const handleVerifyPin = (e) => {
+  const handleVerifyPin = async (e) => {
     e.preventDefault();
     setError('');
     setPinError(false);
@@ -140,7 +140,18 @@ export default function ForgotPasswordPage() {
       return;
     }
 
-    setStep('password');
+    setLoading(true);
+    try {
+      await authService.verificarPin(email.trim(), pin);
+      setStep('password');
+    } catch (err) {
+      const message = err.response?.data?.mensagem || err.response?.data?.message;
+      setError(message || 'Código inválido ou expirado.');
+      setPinError(true);
+      setPin('');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleResetPassword = async (e) => {
@@ -343,6 +354,7 @@ export default function ForgotPasswordPage() {
                 variant="primary"
                 size="lg"
                 fullWidth
+                loading={loading}
                 disabled={pin.length !== 6}
                 icon={ArrowRight}
               >

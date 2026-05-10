@@ -65,6 +65,15 @@ public class AuthController {
         return ResponseEntity.ok(Map.of("mensagem", "Se o e-mail existir, um código de recuperação foi enviado."));
     }
 
+    // RF-BK06: Verificar PIN sem redefinir senha (rota pública)
+    @PostMapping("/verificar-pin")
+    public ResponseEntity<Map<String, String>> verificarPin(@RequestBody Map<String, String> body) {
+        EsqueciSenhaRequest emailReq = new EsqueciSenhaRequest();
+        emailReq.setEmail(body.get("email"));
+        authService.verificarPin(emailReq, body.get("pin"));
+        return ResponseEntity.ok(Map.of("mensagem", "Código válido."));
+    }
+
     // RF-BK06: Redefinir senha com PIN (rota pública)
     @PostMapping("/redefinir-senha")
     public ResponseEntity<Map<String, String>> redefinirSenha(@RequestBody @Valid RedefinirSenhaRequest request) {

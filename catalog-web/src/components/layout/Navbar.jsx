@@ -1,4 +1,4 @@
-import { Search, ShoppingCart, Heart, User, Menu, X, LogOut, Package, ChevronDown, ArrowRight, ImageOff } from 'lucide-react';
+import { Search, ShoppingCart, Heart, User, Menu, X, LogOut, Package, ChevronDown, ArrowRight, ImageOff, Hammer } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
@@ -278,6 +278,14 @@ export default function Navbar() {
                     >
                       <Package size={16} />
                       Meus Pedidos
+                    </Link>
+                    <Link
+                      to="/encomendas"
+                      onClick={() => setProfileMenuOpen(false)}
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors"
+                    >
+                      <Hammer size={16} />
+                      Minhas Encomendas
                     </Link>
                     <Link
                       to="/desejos"

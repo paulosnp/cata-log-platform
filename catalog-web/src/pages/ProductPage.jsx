@@ -14,6 +14,7 @@ import {
   ImageOff,
   AlertTriangle,
   Heart,
+  Hammer,
 } from 'lucide-react';
 import { productService } from '../services/productService';
 import { useAuth } from '../contexts/AuthContext';
@@ -21,6 +22,7 @@ import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
 import { useToast } from '../components/common/Toast';
 import Spinner from '../components/common/Spinner';
+import NovaEncomendaModal from '../components/encomenda/NovaEncomendaModal';
 
 /**
  * Formata um valor numérico para moeda brasileira (BRL).
@@ -55,6 +57,7 @@ export default function ProductPage() {
   const [error, setError] = useState(null);
   const [selectedImage, setSelectedImage] = useState(0);
   const [addingToCart, setAddingToCart] = useState(false);
+  const [encomendaModalOpen, setEncomendaModalOpen] = useState(false);
 
   // ── Carregar produto ao montar ou trocar de ID ──
   useEffect(() => {
@@ -122,6 +125,7 @@ export default function ProductPage() {
     larguraCm,
     alturaCm,
     tempoProducaoDias,
+    artesaoId,
     categoriaNome,
     artesaoNomeAtelie,
     artesaoSeloVerificado,
@@ -379,6 +383,25 @@ export default function ProductPage() {
             </button>
           </div>
 
+          {/* Botão Encomendar Peça Similar */}
+          {!vendido && (
+            <div style={{ paddingTop: '1.25rem' }}>
+              <button
+                onClick={() => {
+                  if (!isAuthenticated) {
+                    navigate(`/login?returnUrl=/produto/${id}`);
+                    return;
+                  }
+                  setEncomendaModalOpen(true);
+                }}
+                className="flex w-full items-center justify-center gap-2.5 rounded-lg border border-outline-variant/20 px-8 py-3.5 text-sm font-semibold text-on-surface-variant transition-all hover:border-primary hover:text-primary hover:shadow-ambient"
+              >
+                <Hammer size={18} />
+                Encomendar Peça Similar
+              </button>
+            </div>
+          )}
+
           {/* Ficha Técnica */}
           {fichaTecnica.length > 0 && (
             <div className="mt-10">
@@ -405,6 +428,15 @@ export default function ProductPage() {
           )}
         </div>
       </div>
+      {/* Modal de Encomenda */}
+      <NovaEncomendaModal
+        isOpen={encomendaModalOpen}
+        onClose={() => setEncomendaModalOpen(false)}
+        artesaoId={artesaoId}
+        artesaoNome={artesaoNomeAtelie}
+        produtoReferenciaId={Number(id)}
+        produtoNome={nome}
+      />
     </div>
   );
 }

@@ -13,6 +13,7 @@ import lombok.Setter;
 @Builder
 public class LoginResponse {
 
+    private Long id;
     private String token;
     private String role;
     private String nome;

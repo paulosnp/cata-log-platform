@@ -44,6 +44,16 @@ export const authService = {
   },
 
   /**
+   * Verificar PIN sem redefinir senha
+   * POST /auth/verificar-pin
+   * @returns {{ mensagem }}
+   */
+  async verificarPin(email, pin) {
+    const { data } = await api.post(`${AUTH_PREFIX}/verificar-pin`, { email, pin });
+    return data;
+  },
+
+  /**
    * Trocar senha (requer token JWT)
    * POST /auth/trocar-senha
    * @returns {{ mensagem }}

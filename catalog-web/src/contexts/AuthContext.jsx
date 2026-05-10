@@ -35,6 +35,7 @@ export function AuthProvider({ children }) {
     const data = await authService.loginComprador(email, senha);
 
     const userData = {
+      id: data.id,
       nome: data.nome,
       role: data.role,
       senhaTemporaria: data.senhaTemporaria,

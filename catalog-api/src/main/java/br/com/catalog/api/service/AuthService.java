@@ -52,6 +52,7 @@ public class AuthService {
         );
 
         return LoginResponse.builder()
+                .id(artesao.getId())
                 .token(token)
                 .role("ARTESAO")
                 .nome(artesao.getNomeAtelie())
@@ -75,6 +76,7 @@ public class AuthService {
         );
 
         return LoginResponse.builder()
+                .id(comprador.getId())
                 .token(token)
                 .role("COMPRADOR")
                 .nome(comprador.getNome())
@@ -98,6 +100,7 @@ public class AuthService {
 
         // RN-02: Flag para o frontend interceptar e forçar troca de senha no primeiro acesso
         return LoginResponse.builder()
+                .id(admin.getId())
                 .token(token)
                 .role("ADMIN")
                 .nome(admin.getEmail())
@@ -170,6 +173,28 @@ public class AuthService {
         }
 
         // Não revelar se o email existe ou não (segurança)
+    }
+
+    public void verificarPin(EsqueciSenhaRequest emailRequest, String pin) {
+        String email = emailRequest.getEmail();
+
+        Optional<Artesao> artesaoOpt = artesaoRepository.findByEmail(email);
+        if (artesaoOpt.isPresent()) {
+            Artesao artesao = artesaoOpt.get();
+            validarCodigoRecuperacao(artesao.getCodigoRecuperacao(), artesao.getValidadeCodigo(), pin);
+            return;
+        }
+
+        Optional<Comprador> compradorOpt = compradorRepository.findByEmail(email);
+        if (compradorOpt.isPresent()) {
+            Comprador comprador = compradorOpt.get();
+            if (!pin.equals(comprador.getCodigoVerificacao())) {
+                throw new CodigoRecuperacaoInvalidoException();
+            }
+            return;
+        }
+
+        throw new CodigoRecuperacaoInvalidoException();
     }
 
     public void redefinirSenha(RedefinirSenhaRequest request) {

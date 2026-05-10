@@ -184,3 +184,28 @@ h1, h2, h3, h4, h5, h6 {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* ============================================================
+   Stream Chat — Theme Overrides (Cata Log Design System)
+   ============================================================ */
+.catalog-chat-wrapper {
+  --str-chat__primary-color: #b22300;
+  --str-chat__active-primary-color: #8b1a00;
+  --str-chat__surface-color: #fffbff;
+  --str-chat__secondary-surface-color: #f5f0ee;
+  --str-chat__primary-surface-color: #ffdad2;
+  --str-chat__primary-surface-color-low-emphasis: #ffdad2;
+  --str-chat__border-radius-circle: 0.75rem;
+  --str-chat__font-family: 'DM Sans', sans-serif;
+  --str-chat__channel-preview-active-background: #ffdad2;
+}
+
+.catalog-chat-wrapper .str-chat__message-simple--me .str-chat__message-bubble {
+  background-color: #ffdad2;
+  color: #3b0900;
+}
+
+.catalog-chat-wrapper .str-chat__message-input {
+  border-radius: 0.75rem;
+}
+

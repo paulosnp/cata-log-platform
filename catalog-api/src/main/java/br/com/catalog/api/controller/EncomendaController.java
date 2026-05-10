@@ -43,6 +43,12 @@ public class EncomendaController {
         return ResponseEntity.ok(encomendaService.aceitarEncomenda(id));
     }
 
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('COMPRADOR', 'ARTESAO')")
+    public ResponseEntity<EncomendaResponse> buscarPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(encomendaService.buscarPorId(id));
+    }
+
     @GetMapping("/comprador")
     @PreAuthorize("hasAuthority('COMPRADOR')")
     public ResponseEntity<Page<EncomendaResponse>> listarEncomendasComprador(

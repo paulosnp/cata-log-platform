@@ -117,6 +117,12 @@ public class EncomendaService {
     }
 
     @Transactional(readOnly = true)
+    public EncomendaResponse buscarPorId(Long id) {
+        EncomendaPersonalizada encomenda = buscarEncomenda(id);
+        return toResponse(encomenda);
+    }
+
+    @Transactional(readOnly = true)
     public Page<EncomendaResponse> listarMinhasEncomendasArtesao(Pageable pageable) {
         Long artesaoId = securityUtils.getUsuarioLogadoId();
         return encomendaRepository.findByArtesaoIdOrderByAtualizadoEmDesc(artesaoId, pageable)
