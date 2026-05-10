@@ -87,6 +87,7 @@ public class PedidoService {
         return toResponse(salvo);
     }
 
+    @Transactional(readOnly = true)
     public List<PedidoResponse> listarMeusPedidos() {
         Long compradorId = securityUtils.getUsuarioLogadoId();
         return pedidoRepository.findByCompradorIdOrderByCriadoEmDesc(compradorId).stream()

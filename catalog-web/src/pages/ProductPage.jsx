@@ -23,6 +23,7 @@ import { useWishlist } from '../contexts/WishlistContext';
 import { useToast } from '../components/common/Toast';
 import Spinner from '../components/common/Spinner';
 import NovaEncomendaModal from '../components/encomenda/NovaEncomendaModal';
+import FreightCalculator from '../components/cart/FreightCalculator';
 
 /**
  * Formata um valor numérico para moeda brasileira (BRL).
@@ -426,6 +427,11 @@ export default function ProductPage() {
               </div>
             </div>
           )}
+
+          {/* Calcular Frete */}
+          <div className="mt-10 rounded-xl border border-outline-variant/10 bg-surface-container-lowest p-5">
+            <FreightCalculator onFreteSelected={() => {}} />
+          </div>
         </div>
       </div>
       {/* Modal de Encomenda */}

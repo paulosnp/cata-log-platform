@@ -12,7 +12,6 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { useToast } from '../components/common/Toast';
-import FreightCalculator from '../components/cart/FreightCalculator';
 import Spinner from '../components/common/Spinner';
 
 /**
@@ -27,7 +26,6 @@ export default function CartPage() {
   const { addToast } = useToast();
   const navigate = useNavigate();
 
-  const [freteSelecionado, setFreteSelecionado] = useState(null);
   const [removingId, setRemovingId] = useState(null);
 
   // ── Não logado ──
@@ -100,15 +98,10 @@ export default function CartPage() {
     const result = await clearCart();
     if (result.success) {
       addToast('Carrinho limpo com sucesso.', 'info');
-      setFreteSelecionado(null);
     } else {
       addToast(result.error, 'error');
     }
   };
-
-  // ── Cálculo do total final ──
-  const freteValor = freteSelecionado?.valor || 0;
-  const totalFinal = Number(cartTotal) + freteValor;
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-8 md:py-12">
@@ -226,29 +219,17 @@ export default function CartPage() {
               <span className="text-sm font-semibold">{formatPrice(cartTotal)}</span>
             </div>
 
-            {/* Frete */}
-            <div className="border-b border-outline-variant/10 py-4">
-              <FreightCalculator
-                onFreteSelected={setFreteSelecionado}
-                cartItems={cartItems}
-              />
-              {freteSelecionado && (
-                <div className="mt-3 flex items-center justify-between">
-                  <span className="text-sm text-on-surface-variant">
-                    Frete ({freteSelecionado.nome})
-                  </span>
-                  <span className="text-sm font-semibold">
-                    {formatPrice(freteSelecionado.valor)}
-                  </span>
-                </div>
-              )}
+            {/* Frete — calculado no checkout */}
+            <div className="flex items-center justify-between border-b border-outline-variant/10 py-4">
+              <span className="text-sm text-on-surface-variant">Frete</span>
+              <span className="text-xs text-on-surface-variant">Calculado no checkout</span>
             </div>
 
             {/* Total */}
             <div className="flex items-center justify-between pt-4">
               <span className="text-base font-bold">Total</span>
               <span className="text-xl font-bold text-primary">
-                {formatPrice(totalFinal)}
+                {formatPrice(cartTotal)}
               </span>
             </div>
 
