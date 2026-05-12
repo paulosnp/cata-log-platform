@@ -15,6 +15,7 @@ Roadmap-Frontend-Vitrine-Parte2.md
 **/V18__seed_test_data.sql
 **/V19__seed_encomenda_teste_chat.sql
 **/V20__fix_test_passwords.sql
+**/V21__seed_artesao_mobile.sql
 
 # Node.js
 node_modules/

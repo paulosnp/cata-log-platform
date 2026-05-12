@@ -92,6 +92,8 @@ public class SecurityConfig {
                 "https://www.prismcode.site",
                 "http://www.prismcode.site"
         ));
+        // Flutter Web roda em portas dinamicas — permitir qualquer localhost em dev
+        config.setAllowedOriginPatterns(List.of("http://localhost:*"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         config.setAllowCredentials(true);
