@@ -10,12 +10,13 @@ Sprint *.md
 Cata Log Documento de Requisitos V7.md
 docs/
 Roadmap-Frontend-Vitrine-Parte2.md
+Roadmap-Mobile-Artesao.md
+Sprint*.md
 
 # Migração de teste local (não subir para produção)
 **/V18__seed_test_data.sql
 **/V19__seed_encomenda_teste_chat.sql
 **/V20__fix_test_passwords.sql
-**/V21__seed_artesao_mobile.sql
 
 # Node.js
 node_modules/
