@@ -26,6 +26,14 @@ class SecureStorage {
   static Future<String?> getUserData() =>
       _storage.read(key: _userKey);
 
+  // ─── Genérico (para integrações e outros dados) ───
+
+  static Future<void> write(String key, String value) =>
+      _storage.write(key: key, value: value);
+
+  static Future<String?> read(String key) =>
+      _storage.read(key: key);
+
   // ─── Limpeza (Logout) ───
 
   static Future<void> clearAll() => _storage.deleteAll();

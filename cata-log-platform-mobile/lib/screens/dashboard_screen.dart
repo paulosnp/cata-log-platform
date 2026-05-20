@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../theme/app_colors.dart';
 import '../providers/auth_provider.dart';
+import '../providers/chat_provider.dart';
+import '../providers/artesao_provider.dart';
+import '../core/api/api_client.dart';
 import 'tabs/vitrine_tab.dart';
 import 'tabs/encomendas_tab.dart';
 import 'tabs/financeiro_tab.dart';
 import 'nova_obra_screen.dart';
 import 'login_screen.dart';
+import 'integracoes_screen.dart';
+import 'perfil_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -27,6 +33,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
         const EncomendasTab(),
         const FinanceiroTab(),
       ];
+
+  @override
+  void initState() {
+    super.initState();
+    // Conectar chat após o login
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _conectarChat();
+    });
+  }
+
+  void _conectarChat() {
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+    final chat = Provider.of<ChatProvider>(context, listen: false);
+    if (auth.isAuthenticated && !chat.isConnected && auth.user != null) {
+      chat.conectarChat(
+        userId: auth.user!.id,
+        userName: auth.user!.nome,
+      );
+    }
+  }
 
   void _abrirNovaObra() async {
     final result = await Navigator.of(context).push<bool>(
@@ -57,6 +83,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   void _handleLogout() async {
+    // Desconectar chat antes do logout
+    final chatProvider = Provider.of<ChatProvider>(context, listen: false);
+    await chatProvider.desconectarChat();
+
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     await authProvider.logout();
 
@@ -112,12 +142,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ],
                 ),
-                child: const CircleAvatar(
-                  radius: 20,
-                  backgroundColor: AppColors.surfaceContainerHigh,
-                  backgroundImage: NetworkImage(
-                    'https://images.unsplash.com/photo-1556157382-97eda2d62296?w=100',
-                  ),
+                child: Consumer<ArtesaoProvider>(
+                  builder: (context, artesaoProvider, _) {
+                    return _buildAvatar(artesaoProvider, 20);
+                  },
                 ),
               ),
             ),
@@ -217,23 +245,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         width: 3,
                       ),
                     ),
-                    child: const CircleAvatar(
-                      radius: 36,
-                      backgroundColor: AppColors.surfaceContainerHigh,
-                      backgroundImage: NetworkImage(
-                        'https://images.unsplash.com/photo-1556157382-97eda2d62296?w=200',
-                      ),
+                    child: Consumer<ArtesaoProvider>(
+                      builder: (context, artesaoProvider, _) {
+                        return _buildAvatar(artesaoProvider, 36);
+                      },
                     ),
                   ),
                   const SizedBox(height: 16),
-                  Consumer<AuthProvider>(
-                    builder: (context, authProvider, _) {
-                      final userName = authProvider.user?.nome ?? 'Artesão';
+                  Consumer<ArtesaoProvider>(
+                    builder: (context, artesaoProvider, _) {
+                      final nome = artesaoProvider.perfil?.nomeAtelie
+                          ?? Provider.of<AuthProvider>(context, listen: false).user?.nome
+                          ?? 'Artesão';
+                      final role = Provider.of<AuthProvider>(context, listen: false).user?.role ?? '';
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            userName,
+                            nome,
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 20,
                               fontWeight: FontWeight.w700,
@@ -242,7 +271,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            authProvider.user?.role ?? '',
+                            role,
                             style: GoogleFonts.manrope(
                               fontSize: 13,
                               color: AppColors.inverseOnSurface.withValues(alpha: 0.6),
@@ -273,25 +302,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
               label: 'Editar Perfil do Ateliê',
               onTap: () {
                 Navigator.pop(context);
-                _showSnackBarInfo('Editar Perfil do Ateliê');
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const PerfilScreen(),
+                  ),
+                );
               },
             ),
             _DrawerMenuItem(
-              icon: Icons.account_balance_wallet_outlined,
-              label: 'Configurar Recebimentos',
+              icon: Icons.link_rounded,
+              label: 'Integrações',
               subtitle: 'Mercado Pago',
               onTap: () {
                 Navigator.pop(context);
-                _showSnackBarInfo('Configurar Recebimentos (Mercado Pago)');
-              },
-            ),
-            _DrawerMenuItem(
-              icon: Icons.local_shipping_outlined,
-              label: 'Configurar Logística',
-              subtitle: 'Melhor Envio',
-              onTap: () {
-                Navigator.pop(context);
-                _showSnackBarInfo('Configurar Logística (Melhor Envio)');
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const IntegracoesScreen(),
+                  ),
+                );
               },
             ),
 
@@ -333,11 +361,32 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  void _showSnackBarInfo(String feature) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('🔧 $feature — Em breve!'),
-        duration: const Duration(seconds: 2),
+  Widget _buildAvatar(ArtesaoProvider provider, double radius) {
+    final perfil = provider.perfil;
+    final hasFoto = perfil?.fotoUrl != null && perfil!.fotoUrl!.isNotEmpty;
+    final inicial = (perfil?.nomeAtelie ?? 'A').substring(0, 1).toUpperCase();
+
+    if (hasFoto) {
+      final base = kIsWeb
+          ? 'http://localhost:8080'
+          : ApiClient.serverBaseUrl.replaceAll('/api/v1', '');
+      return CircleAvatar(
+        radius: radius,
+        backgroundColor: AppColors.surfaceContainerHigh,
+        backgroundImage: NetworkImage('$base${perfil.fotoUrl}'),
+      );
+    }
+
+    return CircleAvatar(
+      radius: radius,
+      backgroundColor: AppColors.primary,
+      child: Text(
+        inicial,
+        style: GoogleFonts.plusJakartaSans(
+          fontSize: radius * 0.9,
+          fontWeight: FontWeight.w700,
+          color: AppColors.onPrimary,
+        ),
       ),
     );
   }

@@ -31,129 +31,134 @@ class _EncomendasTabState extends State<EncomendasTab> {
   Widget build(BuildContext context) {
     return Consumer<EncomendaProvider>(
       builder: (context, provider, _) {
-        return CustomScrollView(
-          slivers: [
-            // ─── Header ───
-            SliverToBoxAdapter(
-              child: Container(
-                padding: EdgeInsets.only(
-                  top: MediaQuery.of(context).padding.top + 16,
-                  left: 24,
-                  right: 24,
-                  bottom: 24,
-                ),
-                decoration: const BoxDecoration(
-                  gradient: AppColors.subtleGradient,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 44,
-                          height: 44,
-                          decoration: BoxDecoration(
-                            gradient: AppColors.primaryGradient,
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: const Icon(
-                            Icons.assignment_rounded,
-                            color: AppColors.onPrimary,
-                            size: 22,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            'Encomendas',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 22,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.onSurface,
+        return RefreshIndicator(
+          color: AppColors.primary,
+          onRefresh: () => provider.carregarEncomendas(),
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: [
+              // ─── Header ───
+              SliverToBoxAdapter(
+                child: Container(
+                  padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).padding.top + 16,
+                    left: 24,
+                    right: 24,
+                    bottom: 24,
+                  ),
+                  decoration: const BoxDecoration(
+                    gradient: AppColors.subtleGradient,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 44,
+                            height: 44,
+                            decoration: BoxDecoration(
+                              gradient: AppColors.primaryGradient,
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: const Icon(
+                              Icons.assignment_rounded,
+                              color: AppColors.onPrimary,
+                              size: 22,
                             ),
                           ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'Encomendas',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.onSurface,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Gerencie seus pedidos personalizados.',
+                        style: GoogleFonts.manrope(
+                          fontSize: 14,
+                          color: AppColors.onSurfaceVariant,
+                          height: 1.5,
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Gerencie seus pedidos personalizados.',
-                      style: GoogleFonts.manrope(
-                        fontSize: 14,
-                        color: AppColors.onSurfaceVariant,
-                        height: 1.5,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            // ─── Stats ───
-            if (!provider.isLoading && provider.encomendas.isNotEmpty)
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                  child: Row(
-                    children: [
-                      _StatChip(
-                        label: 'Pendentes',
-                        value: provider.totalAguardando.toString(),
-                        color: AppColors.statusAguardando,
-                      ),
-                      const SizedBox(width: 12),
-                      _StatChip(
-                        label: 'Enviadas',
-                        value: provider.totalEnviadas.toString(),
-                        color: AppColors.statusOrcamentoEnviado,
-                      ),
-                      const SizedBox(width: 12),
-                      _StatChip(
-                        label: 'Acordadas',
-                        value: provider.totalAcordadas.toString(),
-                        color: AppColors.primary,
                       ),
                     ],
                   ),
                 ),
               ),
 
-            // ─── Conteudo ───
-            if (provider.isLoading)
-              const SliverFillRemaining(
-                child: Center(
-                  child: CircularProgressIndicator(
-                    color: AppColors.primary,
+              // ─── Stats ───
+              if (!provider.isLoading && provider.encomendas.isNotEmpty)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                    child: Row(
+                      children: [
+                        _StatChip(
+                          label: 'Pendentes',
+                          value: provider.totalAguardando.toString(),
+                          color: AppColors.statusAguardando,
+                        ),
+                        const SizedBox(width: 12),
+                        _StatChip(
+                          label: 'Enviadas',
+                          value: provider.totalEnviadas.toString(),
+                          color: AppColors.statusOrcamentoEnviado,
+                        ),
+                        const SizedBox(width: 12),
+                        _StatChip(
+                          label: 'Acordadas',
+                          value: provider.totalAcordadas.toString(),
+                          color: AppColors.primary,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              )
-            else if (provider.errorMessage != null)
-              SliverFillRemaining(
-                child: _buildErrorState(provider),
-              )
-            else if (provider.encomendas.isEmpty)
-              SliverFillRemaining(
-                child: _buildEmptyState(),
-              )
-            else
-              SliverPadding(
-                padding: const EdgeInsets.fromLTRB(24, 0, 24, 100),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final encomenda = provider.encomendas[index];
-                      return _EncomendaCard(
-                        encomenda: encomenda,
-                        onTap: () => _handleEncomendaTap(encomenda),
-                      );
-                    },
-                    childCount: provider.encomendas.length,
+
+              // ─── Conteudo ───
+              if (provider.isLoading)
+                const SliverFillRemaining(
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      color: AppColors.primary,
+                    ),
+                  ),
+                )
+              else if (provider.errorMessage != null)
+                SliverFillRemaining(
+                  child: _buildErrorState(provider),
+                )
+              else if (provider.encomendas.isEmpty)
+                SliverFillRemaining(
+                  child: _buildEmptyState(),
+                )
+              else
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(24, 0, 24, 100),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final encomenda = provider.encomendas[index];
+                        return _EncomendaCard(
+                          encomenda: encomenda,
+                          onTap: () => _handleEncomendaTap(encomenda),
+                        );
+                      },
+                      childCount: provider.encomendas.length,
+                    ),
                   ),
                 ),
-              ),
-          ],
+            ],
+          ),
         );
       },
     );

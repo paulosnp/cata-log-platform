@@ -14,6 +14,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
 import { useToast } from '../../components/common/Toast';
 import { orderService } from '../../services/orderService';
+import { resolveImageUrl } from '../../services/imageUtils';
 import FreightCalculator from '../../components/cart/FreightCalculator';
 import Button from '../../components/common/Button';
 import Spinner from '../../components/common/Spinner';
@@ -178,7 +179,7 @@ export default function CheckoutPage() {
                   >
                     {item.imagemUrl ? (
                       <img
-                        src={item.imagemUrl}
+                        src={resolveImageUrl(item.imagemUrl)}
                         alt={item.produtoNome}
                         className="h-16 w-16 object-cover"
                       />

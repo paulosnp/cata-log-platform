@@ -3,6 +3,7 @@ import { Percent, Gem, Star, BadgeCheck, ImageOff, Heart } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useWishlist } from '../../contexts/WishlistContext';
 import { useToast } from './Toast';
+import { resolveImageUrl } from '../../services/imageUtils';
 
 /**
  * Formata um valor numérico para moeda brasileira (BRL).
@@ -43,17 +44,12 @@ export default function ProductCard({ produto }) {
   } = produto;
 
   // Primeira imagem do array ou null
-  const imagemPrincipal = imagensUrls?.length > 0 ? imagensUrls[0] : null;
+  const imagemPrincipal = imagensUrls?.length > 0 ? resolveImageUrl(imagensUrls[0]) : null;
   const wishlisted = isWishlisted(id);
 
   const handleWishlistClick = async (e) => {
     e.preventDefault(); // Evita navegação do Link pai
     e.stopPropagation();
-
-    if (!isAuthenticated) {
-      navigate('/login');
-      return;
-    }
 
     const result = await toggleWishlist(id);
     if (result.success) {

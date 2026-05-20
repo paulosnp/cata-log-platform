@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -6,6 +7,9 @@ import '../../theme/app_colors.dart';
 import '../../theme/app_theme.dart';
 import '../../providers/produto_provider.dart';
 import '../../models/produto_response.dart';
+import '../../core/api/api_client.dart';
+import '../editar_obra_screen.dart';
+import '../dialogs/excluir_obra_dialog.dart';
 
 class VitrineTab extends StatefulWidget {
   const VitrineTab({super.key});
@@ -31,7 +35,11 @@ class _VitrineTabState extends State<VitrineTab> {
   Widget build(BuildContext context) {
     return Consumer<ProdutoProvider>(
       builder: (context, provider, _) {
-        return CustomScrollView(
+        return RefreshIndicator(
+          color: AppColors.primary,
+          onRefresh: () => provider.carregarMeusProdutos(),
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             // ─── Header ───
             SliverToBoxAdapter(
@@ -140,6 +148,7 @@ class _VitrineTabState extends State<VitrineTab> {
                 ),
               ),
           ],
+          ),
         );
       },
     );
@@ -229,12 +238,14 @@ class _VitrineTabState extends State<VitrineTab> {
   void _handleMenuAction(String action, ProdutoResponse produto) {
     switch (action) {
       case 'editar':
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('✏️ Editar "${produto.nome}" — Em breve!'),
-            duration: const Duration(seconds: 2),
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => EditarObraScreen(produto: produto),
           ),
         );
+        break;
+      case 'excluir':
+        ExcluirObraDialog.show(context, produto);
         break;
       case 'vender':
         _confirmarVenda(produto);
@@ -456,6 +467,24 @@ class _ProdutoCard extends StatelessWidget {
                   },
                 ),
 
+              // ─── Opção destrutiva: Excluir ───
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Container(
+                  height: 1,
+                  color: AppColors.outlineVariant.withValues(alpha: 0.12),
+                ),
+              ),
+              _BottomSheetOption(
+                icon: Icons.delete_outline_rounded,
+                label: 'Excluir Obra',
+                isDestructive: true,
+                onTap: () {
+                  Navigator.pop(ctx);
+                  onMenuAction('excluir');
+                },
+              ),
+
               const SizedBox(height: 12),
             ],
           ),
@@ -466,8 +495,16 @@ class _ProdutoCard extends StatelessWidget {
 
   Widget _buildImage(String? url, double iconSize) {
     if (url != null && url.isNotEmpty) {
+      // Resolve URL relativa (/imagens/...) para URL absoluta
+      String resolvedUrl = url;
+      if (!url.startsWith('http')) {
+        final base = kIsWeb
+            ? 'http://localhost:8080'
+            : ApiClient.serverBaseUrl.replaceAll('/api/v1', '');
+        resolvedUrl = '$base$url';
+      }
       return Image.network(
-        url,
+        resolvedUrl,
         fit: BoxFit.cover,
         errorBuilder: (_, __, ___) => Container(
           color: AppColors.surfaceContainerHigh,
@@ -626,15 +663,19 @@ class _BottomSheetOption extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
+  final bool isDestructive;
 
   const _BottomSheetOption({
     required this.icon,
     required this.label,
     required this.onTap,
+    this.isDestructive = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final color = isDestructive ? AppColors.error : AppColors.primary;
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -647,13 +688,13 @@ class _BottomSheetOption extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.08),
+                  color: color.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                 ),
                 child: Icon(
                   icon,
                   size: 20,
-                  color: AppColors.primary,
+                  color: color,
                 ),
               ),
               const SizedBox(width: 16),
@@ -662,7 +703,7 @@ class _BottomSheetOption extends StatelessWidget {
                 style: GoogleFonts.manrope(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.onSurface,
+                  color: isDestructive ? AppColors.error : AppColors.onSurface,
                 ),
               ),
             ],

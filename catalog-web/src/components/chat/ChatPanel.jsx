@@ -4,6 +4,7 @@ import { useChat } from '../../contexts/ChatContext';
 import Spinner from '../common/Spinner';
 
 import 'stream-chat-react/dist/css/index.css';
+import './ChatPanel.css';
 
 export default function ChatPanel({ channelId }) {
   const { chatClient, chatReady } = useChat();

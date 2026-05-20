@@ -27,6 +27,10 @@ public class ChatService {
      * Gera um token JWT compatível com o Stream Chat para o utilizador logado.
      * O token usa o formato padrão do Stream: JWT assinado com HS256,
      * contendo a claim "user_id" com o ID do utilizador.
+     *
+     * NOTA: Deve ser HS256 obrigatoriamente — o Stream Chat rejeita HS512.
+     * Como o secret tem 512 bits, o jjwt auto-selecciona HS512 se não
+     * especificarmos o algoritmo explicitamente.
      */
     public ChatTokenResponse gerarStreamToken() {
         Long userId = securityUtils.getUsuarioLogadoId();
@@ -35,7 +39,7 @@ public class ChatService {
 
         String token = Jwts.builder()
                 .claim("user_id", String.valueOf(userId))
-                .signWith(key)
+                .signWith(key, Jwts.SIG.HS256)
                 .compact();
 
         return ChatTokenResponse.builder()

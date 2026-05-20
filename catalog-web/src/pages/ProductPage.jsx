@@ -21,6 +21,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
 import { useToast } from '../components/common/Toast';
+import { resolveImageUrl } from '../services/imageUtils';
 import Spinner from '../components/common/Spinner';
 import NovaEncomendaModal from '../components/encomenda/NovaEncomendaModal';
 import FreightCalculator from '../components/cart/FreightCalculator';
@@ -136,7 +137,7 @@ export default function ProductPage() {
   } = produto;
 
   // Imagens disponíveis
-  const imagens = imagensUrls?.length > 0 ? imagensUrls : [];
+  const imagens = imagensUrls?.length > 0 ? imagensUrls.map(resolveImageUrl) : [];
   const imagemAtual = imagens[selectedImage] || null;
   const wishlisted = isWishlisted(Number(id));
 
@@ -150,11 +151,6 @@ export default function ProductPage() {
 
   // ── Adicionar ao Carrinho ──
   const handleAddToCart = async () => {
-    if (!isAuthenticated) {
-      navigate('/login');
-      return;
-    }
-
     setAddingToCart(true);
     const result = await addToCart(Number(id), 1);
     setAddingToCart(false);
@@ -168,11 +164,6 @@ export default function ProductPage() {
 
   // ── Toggle Wishlist ──
   const handleWishlistToggle = async () => {
-    if (!isAuthenticated) {
-      navigate('/login');
-      return;
-    }
-
     const result = await toggleWishlist(Number(id));
     if (result.success) {
       addToast(

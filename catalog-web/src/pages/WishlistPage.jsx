@@ -10,14 +10,18 @@ import {
 import { wishlistService } from '../services/wishlistService';
 import { useWishlist } from '../contexts/WishlistContext';
 import { useCart } from '../contexts/CartContext';
+import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../components/common/Toast';
+import { resolveImageUrl } from '../services/imageUtils';
+import { enrichGuestWishlist } from '../services/guestCartHelper';
 import Spinner from '../components/common/Spinner';
 
 const formatPrice = (value) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 
 export default function WishlistPage() {
-  const { toggleWishlist } = useWishlist();
+  const { isAuthenticated } = useAuth();
+  const { toggleWishlist, wishlistIds } = useWishlist();
   const { addToCart } = useCart();
   const { addToast } = useToast();
 
@@ -26,20 +30,35 @@ export default function WishlistPage() {
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
-  // ── Carregar favoritos ──
+  // ── Carregar favoritos (API para logado, localStorage para guest) ──
   useEffect(() => {
     setLoading(true);
-    wishlistService
-      .listar({ page, size: 12 })
-      .then((res) => {
-        setItems(res.data.content);
-        setTotalPages(res.data.totalPages);
-      })
-      .catch(() => {
-        addToast('Erro ao carregar favoritos.', 'error');
-      })
-      .finally(() => setLoading(false));
-  }, [page, addToast]);
+
+    if (isAuthenticated) {
+      // Logado: busca da API
+      wishlistService
+        .listar({ page, size: 12 })
+        .then((res) => {
+          setItems(res.data.content);
+          setTotalPages(res.data.totalPages);
+        })
+        .catch(() => {
+          addToast('Erro ao carregar favoritos.', 'error');
+        })
+        .finally(() => setLoading(false));
+    } else {
+      // Guest: enriquece do localStorage
+      enrichGuestWishlist()
+        .then((enriched) => {
+          setItems(enriched);
+          setTotalPages(1); // Guest não tem paginação
+        })
+        .catch(() => {
+          addToast('Erro ao carregar favoritos.', 'error');
+        })
+        .finally(() => setLoading(false));
+    }
+  }, [page, addToast, isAuthenticated, wishlistIds]);
 
   // ── Remover da wishlist ──
   const handleRemove = async (produtoId) => {
@@ -118,7 +137,7 @@ export default function WishlistPage() {
               {item.imagemUrl ? (
                 <div className="aspect-square overflow-hidden">
                   <img
-                    src={item.imagemUrl}
+                    src={resolveImageUrl(item.imagemUrl)}
                     alt={item.nomeProduto}
                     className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />
@@ -172,8 +191,8 @@ export default function WishlistPage() {
         ))}
       </div>
 
-      {/* Paginação */}
-      {totalPages > 1 && (
+      {/* Paginação (apenas para logados com paginação da API) */}
+      {isAuthenticated && totalPages > 1 && (
         <div className="mt-10 flex items-center justify-center gap-4">
           <button
             onClick={() => setPage((p) => Math.max(0, p - 1))}

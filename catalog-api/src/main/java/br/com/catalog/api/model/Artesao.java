@@ -71,6 +71,8 @@ public class Artesao {
     @Column(length = 100)
     private String cidade;
 
+    @Column(name = "foto_url")
+    private String fotoUrl;
     @Builder.Default
     @Column(name = "saldo_rendimentos", precision = 10, scale = 2)
     private BigDecimal saldoRendimentos = BigDecimal.ZERO;

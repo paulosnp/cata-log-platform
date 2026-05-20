@@ -52,6 +52,8 @@ services:
     build:
       context: ./catalog-web
       dockerfile: Dockerfile
+      args:
+        VITE_STREAM_CHAT_API_KEY: ${STREAM_CHAT_API_KEY}
     container_name: catalog-web
     restart: unless-stopped
     ports:

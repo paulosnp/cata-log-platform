@@ -16,6 +16,8 @@ dependencies:
   dio: ^5.7.0
   flutter_secure_storage: ^9.2.4
   provider: ^6.1.2
+  stream_chat_flutter: ^9.23.0
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:

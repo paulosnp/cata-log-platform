@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:image_picker/image_picker.dart';
 import '../models/produto_response.dart';
 import '../models/categoria_response.dart';
 import '../services/produto_service.dart';
@@ -64,21 +65,42 @@ class ProdutoProvider extends ChangeNotifier {
 
   // ─── Criar Produto ───
 
-  /// Cria um novo produto e recarrega a lista em caso de sucesso.
-  /// Retorna true se sucesso, false se erro.
-  Future<bool> adicionarProduto(Map<String, dynamic> dados) async {
+  /// Cria um novo produto e retorna o ProdutoResponse com ID.
+  /// Retorna null se erro.
+  Future<ProdutoResponse?> adicionarProduto(Map<String, dynamic> dados) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      await _produtoService.criarProduto(dados);
+      final produto = await _produtoService.criarProduto(dados);
       // Recarrega a lista para incluir o novo produto
+      await carregarMeusProdutos();
+      return produto;
+    } catch (e) {
+      _errorMessage = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return null;
+    }
+  }
+
+  // ─── Upload de Imagens ───
+
+  /// Faz upload de imagem(ns) para um produto.
+  /// Aceita XFiles para compatibilidade Web e Mobile.
+  /// Retorna true se TODOS os uploads foram bem-sucedidos.
+  Future<bool> uploadImagensProduto(
+      int produtoId, List<XFile> imagens) async {
+    try {
+      for (final img in imagens) {
+        final bytes = await img.readAsBytes();
+        await _produtoService.uploadImagem(produtoId, bytes, img.name);
+      }
       await carregarMeusProdutos();
       return true;
     } catch (e) {
       _errorMessage = e.toString();
-      _isLoading = false;
       notifyListeners();
       return false;
     }
@@ -111,6 +133,43 @@ class ProdutoProvider extends ChangeNotifier {
   Future<bool> deletarProduto(int id) async {
     try {
       await _produtoService.deletarProduto(id);
+      _produtos.removeWhere((p) => p.id == id);
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
+
+  // ─── Atualizar Produto (Edição) ───
+
+  /// Atualiza os dados em texto de um produto existente.
+  /// PUT /produtos/{id} — atualiza o item na lista local após sucesso.
+  Future<bool> atualizarProduto(int id, Map<String, dynamic> dados) async {
+    try {
+      final atualizado = await _produtoService.editarProduto(id, dados);
+      final index = _produtos.indexWhere((p) => p.id == id);
+      if (index != -1) {
+        _produtos[index] = atualizado;
+      }
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
+
+  // ─── Remover Produto (Exclusão com padrão GitHub) ───
+
+  /// Remove um produto permanentemente (DELETE /produtos/{id}).
+  /// Remove da lista local após sucesso na API.
+  Future<bool> removerProduto(int id) async {
+    try {
+      await _produtoService.excluirProduto(id);
       _produtos.removeWhere((p) => p.id == id);
       notifyListeners();
       return true;

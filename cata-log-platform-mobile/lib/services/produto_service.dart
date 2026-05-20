@@ -55,6 +55,20 @@ class ProdutoService {
     }
   }
 
+  /// Edita os dados em texto de um produto existente.
+  /// PUT /produtos/{id}
+  Future<ProdutoResponse> editarProduto(
+      int id, Map<String, dynamic> dados) async {
+    try {
+      final response = await _dio.put('/produtos/$id', data: dados);
+      return ProdutoResponse.fromJson(response.data);
+    } on DioException catch (e) {
+      throw _handleError(e);
+    } catch (e) {
+      throw 'Erro ao atualizar produto.';
+    }
+  }
+
   /// Desativa (deleta logicamente) um produto.
   /// DELETE /produtos/{id}
   Future<void> deletarProduto(int id) async {
@@ -64,6 +78,40 @@ class ProdutoService {
       throw _handleError(e);
     } catch (e) {
       throw 'Erro ao remover produto.';
+    }
+  }
+
+  /// Alias semântico para deletarProduto — usado no fluxo de exclusão.
+  /// DELETE /produtos/{id}
+  Future<void> excluirProduto(int id) => deletarProduto(id);
+
+  /// Faz upload de uma imagem para um produto.
+  /// POST /produtos/{id}/imagens (multipart/form-data, chave: "arquivo")
+  /// Aceita bytes + filename para compatibilidade Web e Mobile.
+  Future<ProdutoResponse> uploadImagem(
+      int produtoId, List<int> bytes, String filename) async {
+    try {
+      final formData = FormData.fromMap({
+        'arquivo': MultipartFile.fromBytes(
+          bytes,
+          filename: filename,
+        ),
+      });
+
+      final response = await _dio.post(
+        '/produtos/$produtoId/imagens',
+        data: formData,
+        options: Options(
+          sendTimeout: const Duration(seconds: 60),
+          receiveTimeout: const Duration(seconds: 60),
+        ),
+      );
+
+      return ProdutoResponse.fromJson(response.data);
+    } on DioException catch (e) {
+      throw _handleError(e);
+    } catch (e) {
+      throw 'Erro ao enviar imagem.';
     }
   }
 

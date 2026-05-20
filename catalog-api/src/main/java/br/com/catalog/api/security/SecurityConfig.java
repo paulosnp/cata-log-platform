@@ -71,6 +71,13 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /**
+     * Imagens estáticas servidas em /imagens/** já são permitAll() na chain
+     * e passam pelo filtro de CORS normalmente.
+     * NÃO usar web.ignoring() aqui — isso desabilita o CorsFilter e causa
+     * bloqueio de CORS no browser (Flutter Web, Frontend Next.js, etc.).
+     */
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

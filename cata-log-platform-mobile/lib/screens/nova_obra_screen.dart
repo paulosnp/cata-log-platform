@@ -1,6 +1,8 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
@@ -21,7 +23,13 @@ class _NovaObraScreenState extends State<NovaObraScreen> {
   final _materialController = TextEditingController();
   bool _pecaUnica = false;
   bool _isSubmitting = false;
+  String _statusText = '';
   int? _categoriaSelecionadaId;
+
+  // ─── Image Picker ───
+  final ImagePicker _picker = ImagePicker();
+  final List<XFile> _imagensSelecionadas = [];
+  static const int _maxImagens = 5;
 
   @override
   void initState() {
@@ -43,24 +51,141 @@ class _NovaObraScreenState extends State<NovaObraScreen> {
     super.dispose();
   }
 
+  // ─── Selecionar Imagens ───
+
+  Future<void> _selecionarImagens() async {
+    if (_imagensSelecionadas.length >= _maxImagens) {
+      _showSnackBar('Limite de $_maxImagens fotos atingido.', isError: true);
+      return;
+    }
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.surfaceContainerLowest,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.outlineVariant.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'Adicionar fotos',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.onSurface,
+                ),
+              ),
+              const SizedBox(height: 20),
+              _BottomSheetOption(
+                icon: Icons.photo_library_rounded,
+                label: 'Galeria',
+                subtitle: 'Escolher da galeria de fotos',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _pickFromGallery();
+                },
+              ),
+              const SizedBox(height: 8),
+              _BottomSheetOption(
+                icon: Icons.camera_alt_rounded,
+                label: 'Câmera',
+                subtitle: 'Tirar uma foto agora',
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _pickFromCamera();
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _pickFromGallery() async {
+    try {
+      final remaining = _maxImagens - _imagensSelecionadas.length;
+      final images = await _picker.pickMultiImage(
+        maxWidth: 1920,
+        maxHeight: 1920,
+        imageQuality: 85,
+      );
+
+      if (images.isNotEmpty) {
+        setState(() {
+          final toAdd = images.take(remaining).toList();
+          _imagensSelecionadas.addAll(toAdd);
+          if (images.length > remaining) {
+            _showSnackBar(
+              'Apenas $remaining foto(s) adicionada(s). Limite: $_maxImagens.',
+              isError: false,
+            );
+          }
+        });
+      }
+    } on PlatformException catch (_) {
+      if (mounted) {
+        _showSnackBar(
+          'Permissão negada. Ative o acesso à galeria nas configurações.',
+          isError: true,
+        );
+      }
+    }
+  }
+
+  Future<void> _pickFromCamera() async {
+    try {
+      final photo = await _picker.pickImage(
+        source: ImageSource.camera,
+        maxWidth: 1920,
+        maxHeight: 1920,
+        imageQuality: 85,
+      );
+
+      if (photo != null) {
+        setState(() => _imagensSelecionadas.add(photo));
+      }
+    } on PlatformException catch (_) {
+      if (mounted) {
+        _showSnackBar(
+          'Permissão negada. Ative o acesso à câmera nas configurações.',
+          isError: true,
+        );
+      }
+    }
+  }
+
+  void _removerImagem(int index) {
+    setState(() => _imagensSelecionadas.removeAt(index));
+  }
+
+  // ─── Submit ───
+
   Future<void> _submitNovoProduto() async {
     if (!_formKey.currentState!.validate()) return;
 
     if (_categoriaSelecionadaId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Selecione uma categoria.',
-            style: GoogleFonts.manrope(fontSize: 14),
-          ),
-          backgroundColor: AppColors.error,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      _showSnackBar('Selecione uma categoria.', isError: true);
       return;
     }
 
-    setState(() => _isSubmitting = true);
+    setState(() {
+      _isSubmitting = true;
+      _statusText = 'Publicando...';
+    });
 
     final dados = <String, dynamic>{
       'nome': _tituloController.text.trim(),
@@ -78,62 +203,115 @@ class _NovaObraScreenState extends State<NovaObraScreen> {
     if (material.isNotEmpty) dados['material'] = material;
 
     final provider = Provider.of<ProdutoProvider>(context, listen: false);
-    final sucesso = await provider.adicionarProduto(dados);
+
+    // 1. Criar o produto
+    final produto = await provider.adicionarProduto(dados);
 
     if (!mounted) return;
 
-    setState(() => _isSubmitting = false);
-
-    if (sucesso) {
-      Navigator.of(context).pop(true);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.check_circle_outline,
-                  color: Colors.white, size: 20),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  '"${_tituloController.text.trim()}" adicionada à vitrine!',
-                  style: GoogleFonts.manrope(
-                      fontSize: 14, fontWeight: FontWeight.w500),
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: AppColors.statusOrcamentoEnviado,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-          ),
-        ),
-      );
-    } else if (provider.errorMessage != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.error_outline,
-                  color: AppColors.onError, size: 20),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  provider.errorMessage!,
-                  style: GoogleFonts.manrope(fontSize: 14),
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: AppColors.error,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-          ),
-        ),
-      );
+    if (produto == null) {
+      setState(() {
+        _isSubmitting = false;
+        _statusText = '';
+      });
+      _showSnackBar(provider.errorMessage ?? 'Erro ao criar produto.',
+          isError: true);
       provider.clearError();
+      return;
     }
+
+    // 2. Upload das imagens (se existirem)
+    if (_imagensSelecionadas.isNotEmpty) {
+      final total = _imagensSelecionadas.length;
+      setState(() =>
+          _statusText = 'Enviando fotos... (0/$total)');
+
+      bool allUploadsOk = true;
+      for (int i = 0; i < total; i++) {
+        if (!mounted) return;
+        setState(() =>
+            _statusText = 'Enviando fotos... (${i + 1}/$total)');
+
+        try {
+          await provider.uploadImagensProduto(
+            produto.id,
+            [_imagensSelecionadas[i]],
+          );
+        } catch (_) {
+          allUploadsOk = false;
+        }
+      }
+
+      if (!mounted) return;
+
+      if (!allUploadsOk) {
+        _showSnackBar(
+          'Produto criado, mas algumas fotos falharam. Tente reenviá-las.',
+          isError: true,
+        );
+      }
+    }
+
+    if (!mounted) return;
+
+    setState(() {
+      _isSubmitting = false;
+      _statusText = '';
+    });
+
+    Navigator.of(context).pop(true);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle_outline,
+                color: Colors.white, size: 20),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                '"${_tituloController.text.trim()}" adicionada à vitrine!',
+                style: GoogleFonts.manrope(
+                    fontSize: 14, fontWeight: FontWeight.w500),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: AppColors.statusOrcamentoEnviado,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        ),
+      ),
+    );
+  }
+
+  void _showSnackBar(String message, {required bool isError}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              isError ? Icons.error_outline : Icons.info_outline,
+              color: Colors.white,
+              size: 20,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                message,
+                style: GoogleFonts.manrope(fontSize: 14),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor:
+            isError ? AppColors.error : AppColors.statusAguardando,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        ),
+      ),
+    );
   }
 
   @override
@@ -154,68 +332,8 @@ class _NovaObraScreenState extends State<NovaObraScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ─── Upload de Fotos (placeholder) ───
-              GestureDetector(
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                          '📷 Upload de imagem disponível na próxima versão'),
-                    ),
-                  );
-                },
-                child: Container(
-                  width: double.infinity,
-                  height: 200,
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceContainerLow,
-                    borderRadius:
-                        BorderRadius.circular(AppTheme.radiusLg),
-                    border: Border.all(
-                      color:
-                          AppColors.outlineVariant.withValues(alpha: 0.3),
-                      width: 2,
-                      strokeAlign: BorderSide.strokeAlignInside,
-                    ),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 56,
-                        height: 56,
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryContainer
-                              .withValues(alpha: 0.2),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.add_a_photo_outlined,
-                          size: 28,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Adicionar fotos da sua obra',
-                        style: GoogleFonts.manrope(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'JPG, PNG • Máx. 5 fotos',
-                        style: GoogleFonts.manrope(
-                          fontSize: 12,
-                          color: AppColors.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+              // ─── Upload de Fotos ───
+              _buildImageSelector(),
               const SizedBox(height: 28),
 
               // ─── Nome ───
@@ -513,7 +631,7 @@ class _NovaObraScreenState extends State<NovaObraScreen> {
                             size: 20),
                     label: Text(
                       _isSubmitting
-                          ? 'Publicando...'
+                          ? _statusText
                           : 'Publicar na Vitrine',
                     ),
                     style: ElevatedButton.styleFrom(
@@ -536,6 +654,194 @@ class _NovaObraScreenState extends State<NovaObraScreen> {
     );
   }
 
+  // ─── Image Selector Widget ───
+
+  Widget _buildImageSelector() {
+    if (_imagensSelecionadas.isEmpty) {
+      return GestureDetector(
+        onTap: _selecionarImagens,
+        child: Container(
+          width: double.infinity,
+          height: 200,
+          decoration: BoxDecoration(
+            color: AppColors.surfaceContainerLow,
+            borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+            border: Border.all(
+              color: AppColors.outlineVariant.withValues(alpha: 0.3),
+              width: 2,
+              strokeAlign: BorderSide.strokeAlignInside,
+            ),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryContainer
+                      .withValues(alpha: 0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.add_a_photo_outlined,
+                  size: 28,
+                  color: AppColors.primary,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Adicionar fotos da sua obra',
+                style: GoogleFonts.manrope(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primary,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'JPG, PNG • Máx. $_maxImagens fotos',
+                style: GoogleFonts.manrope(
+                  fontSize: 12,
+                  color: AppColors.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // Preview com imagens selecionadas
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Fotos (${_imagensSelecionadas.length}/$_maxImagens)',
+              style: GoogleFonts.manrope(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: AppColors.onSurface,
+              ),
+            ),
+            if (_imagensSelecionadas.length < _maxImagens)
+              TextButton.icon(
+                onPressed: _selecionarImagens,
+                icon: const Icon(Icons.add_rounded, size: 18),
+                label: Text(
+                  'Adicionar',
+                  style: GoogleFonts.manrope(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.primary,
+                ),
+              ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        SizedBox(
+          height: 120,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: _imagensSelecionadas.length,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: EdgeInsets.only(
+                  right: index < _imagensSelecionadas.length - 1
+                      ? 10
+                      : 0,
+                ),
+                child: Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius:
+                          BorderRadius.circular(AppTheme.radiusMd),
+                      child: FutureBuilder<Uint8List>(
+                        future: _imagensSelecionadas[index].readAsBytes(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            return Image.memory(
+                              snapshot.data!,
+                              width: 120,
+                              height: 120,
+                              fit: BoxFit.cover,
+                            );
+                          }
+                          return const SizedBox(
+                            width: 120,
+                            height: 120,
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    // Botão remover
+                    Positioned(
+                      top: 4,
+                      right: 4,
+                      child: GestureDetector(
+                        onTap: () => _removerImagem(index),
+                        child: Container(
+                          width: 24,
+                          height: 24,
+                          decoration: BoxDecoration(
+                            color: AppColors.error.withValues(alpha: 0.9),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.close_rounded,
+                            size: 14,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Badge primeira foto
+                    if (index == 0)
+                      Positioned(
+                        bottom: 4,
+                        left: 4,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.inverseSurface
+                                .withValues(alpha: 0.7),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            'Capa',
+                            style: GoogleFonts.manrope(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.inverseOnSurface,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildLabel(String text) {
     return Text(
       text,
@@ -544,6 +850,78 @@ class _NovaObraScreenState extends State<NovaObraScreen> {
         fontWeight: FontWeight.w600,
         letterSpacing: 0.5,
         color: AppColors.onSurface,
+      ),
+    );
+  }
+}
+
+// ─── Bottom Sheet Option ───
+
+class _BottomSheetOption extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  const _BottomSheetOption({
+    required this.icon,
+    required this.label,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+              horizontal: 16, vertical: 14),
+          child: Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryContainer
+                      .withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, color: AppColors.primary, size: 22),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: GoogleFonts.manrope(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.onSurface,
+                      ),
+                    ),
+                    Text(
+                      subtitle,
+                      style: GoogleFonts.manrope(
+                        fontSize: 12,
+                        color: AppColors.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.chevron_right_rounded,
+                color: AppColors.onSurfaceVariant,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

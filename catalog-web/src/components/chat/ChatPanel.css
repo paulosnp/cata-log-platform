@@ -1,0 +1,14 @@
+/* ─── Overrides do Stream Chat para o Cata Log ───
+ * Esconde o botão "+" que abre "Arquivo" e "Comandos" no composer.
+ * O chat do web é apenas texto — attachments e slash commands
+ * são exclusivos do mobile (artesão).
+ */
+
+.catalog-chat-wrapper .str-chat__attachment-selector {
+  display: none !important;
+}
+
+/* Esconde o menu de acções de attachments caso apareça */
+.catalog-chat-wrapper .str-chat__attachment-selector-actions-menu {
+  display: none !important;
+}

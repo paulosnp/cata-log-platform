@@ -8,10 +8,12 @@ import {
   ShoppingBag,
   ImageOff,
   Gem,
+  LogIn,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { useToast } from '../components/common/Toast';
+import { resolveImageUrl } from '../services/imageUtils';
 import Spinner from '../components/common/Spinner';
 
 /**
@@ -27,27 +29,6 @@ export default function CartPage() {
   const navigate = useNavigate();
 
   const [removingId, setRemovingId] = useState(null);
-
-  // ── Não logado ──
-  if (!isAuthenticated) {
-    return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center px-6 text-center">
-        <div className="mb-4 inline-flex items-center justify-center rounded-full bg-primary-fixed/30 p-4">
-          <ShoppingCart size={32} className="text-primary" />
-        </div>
-        <h1 className="text-xl font-bold font-headline">Acesse sua conta</h1>
-        <p className="mt-2 text-sm text-on-surface-variant">
-          Faça login para ver seu carrinho de compras.
-        </p>
-        <Link
-          to="/login"
-          className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-dim"
-        >
-          Entrar
-        </Link>
-      </div>
-    );
-  }
 
   // ── Loading ──
   if (loading) {
@@ -103,6 +84,16 @@ export default function CartPage() {
     }
   };
 
+  // ── Finalizar compra (logado → checkout, guest → login) ──
+  const handleCheckout = () => {
+    if (isAuthenticated) {
+      navigate('/checkout');
+    } else {
+      addToast('Faça login para finalizar a compra.', 'info');
+      navigate('/login');
+    }
+  };
+
   return (
     <div className="mx-auto max-w-7xl px-6 py-8 md:py-12">
       {/* Header */}
@@ -142,7 +133,7 @@ export default function CartPage() {
               >
                 {item.imagemUrl ? (
                   <img
-                    src={item.imagemUrl}
+                    src={resolveImageUrl(item.imagemUrl)}
                     alt={item.produtoNome}
                     className="h-20 w-20 object-cover transition-transform hover:scale-105"
                   />
@@ -233,14 +224,29 @@ export default function CartPage() {
               </span>
             </div>
 
-            {/* CTA Pagamento */}
+            {/* CTA Pagamento / Login */}
             <button
-              onClick={() => navigate('/checkout')}
+              onClick={handleCheckout}
               className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-3.5 text-sm font-bold text-on-primary transition-all hover:bg-primary-dim hover:shadow-ambient"
             >
-              Ir para Pagamento
-              <ArrowRight size={16} />
+              {isAuthenticated ? (
+                <>
+                  Ir para Pagamento
+                  <ArrowRight size={16} />
+                </>
+              ) : (
+                <>
+                  <LogIn size={16} />
+                  Entrar para Finalizar
+                </>
+              )}
             </button>
+
+            {!isAuthenticated && (
+              <p className="mt-3 text-center text-xs text-on-surface-variant">
+                Seus itens serão mantidos ao fazer login.
+              </p>
+            )}
 
             <Link
               to="/vitrine"

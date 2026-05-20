@@ -41,6 +41,7 @@ export default function App() {
                     <Route path="registro" element={<RegisterPage />} />
                     <Route path="esqueci-senha" element={<ForgotPasswordPage />} />
                     <Route path="carrinho" element={<CartPage />} />
+                    <Route path="desejos" element={<WishlistPage />} />
 
                     {/* ── Feedback de Pagamento (públicas — MP redireciona aqui) ── */}
                     <Route path="pagamento/sucesso" element={<PaymentSuccessPage />} />
@@ -49,7 +50,6 @@ export default function App() {
 
                     {/* ── Rotas Protegidas ── */}
                     <Route element={<PrivateRoute />}>
-                      <Route path="desejos" element={<WishlistPage />} />
                       <Route path="checkout" element={<CheckoutPage />} />
                       <Route path="pedidos" element={<OrdersPage />} />
                       <Route path="encomendas" element={<EncomendaPage />} />
