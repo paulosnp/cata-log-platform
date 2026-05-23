@@ -1,4 +1,18 @@
 services:
+  redis:
+    image: redis:alpine
+    container_name: catalog-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - catalog-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   postgres:
     image: postgres:16-alpine
     container_name: catalog-db
@@ -39,6 +53,8 @@ services:
       MAIL_FROM: ${MAIL_FROM}
       MERCADOPAGO_ACCESS_TOKEN: ${MERCADOPAGO_ACCESS_TOKEN}
       MELHORENVIO_TOKEN: ${MELHORENVIO_TOKEN}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
       TZ: America/Sao_Paulo
     volumes:
       - catalog_uploads:/app/uploads
@@ -46,6 +62,8 @@ services:
       - catalog-network
     depends_on:
       postgres:
+        condition: service_healthy
+      redis:
         condition: service_healthy
 
   catalog-web:

@@ -3,6 +3,8 @@ package br.com.catalog.api.controller;
 import br.com.catalog.api.dto.*;
 import br.com.catalog.api.service.AuthService;
 import br.com.catalog.api.service.RegistroService;
+import br.com.catalog.api.service.TokenBlacklistService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,6 +23,7 @@ public class AuthController {
 
     private final AuthService authService;
     private final RegistroService registroService;
+    private final TokenBlacklistService tokenBlacklistService;
 
     @PostMapping("/artesao/login")
     public ResponseEntity<LoginResponse> loginArtesao(@RequestBody @Valid LoginRequest request) {
@@ -79,5 +82,14 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> redefinirSenha(@RequestBody @Valid RedefinirSenhaRequest request) {
         authService.redefinirSenha(request);
         return ResponseEntity.ok(Map.of("mensagem", "Senha redefinida com sucesso."));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Map<String, String>> logout(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            tokenBlacklistService.blacklist(authHeader.substring(7));
+        }
+        return ResponseEntity.ok(Map.of("mensagem", "Logout realizado com sucesso."));
     }
 }

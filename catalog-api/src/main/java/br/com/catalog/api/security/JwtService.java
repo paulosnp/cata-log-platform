@@ -75,6 +75,11 @@ public class JwtService {
         return extractClaim(token, Claims::getExpiration).before(new Date());
     }
 
+    public long getRemainingExpirationMillis(String token) {
+        Date expiration = extractClaim(token, Claims::getExpiration);
+        return expiration.getTime() - System.currentTimeMillis();
+    }
+
     private <T> T extractClaim(String token, Function<Claims, T> resolver) {
         Claims claims = Jwts.parser()
                 .verifyWith(getSigningKey())

@@ -12,6 +12,9 @@ docs/
 Roadmap-Frontend-Vitrine-Parte2.md
 Roadmap-Mobile-Artesao.md
 Sprint*.md
+PROJECT_MAP.md
+AGENT_BEHAVIOR.md
+Prompts/
 
 # Migração de teste local (não subir para produção)
 **/V18__seed_test_data.sql

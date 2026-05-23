@@ -2,6 +2,7 @@ package br.com.catalog.api.dto;
 
 import lombok.*;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ProdutoResponse {
+public class ProdutoResponse implements Serializable {
 
     private Long id;
     private String nome;

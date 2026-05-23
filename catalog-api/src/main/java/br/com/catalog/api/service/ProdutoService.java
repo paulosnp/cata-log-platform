@@ -17,6 +17,8 @@ import br.com.catalog.api.security.SecurityUtils;
 import br.com.catalog.api.specification.ProdutoSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -45,12 +47,14 @@ public class ProdutoService {
 
     // ======================== VITRINE PÚBLICA ========================
 
+    @Cacheable(value = "produtosVitrine", key = "'list:' + #pageable.pageNumber + ':' + #pageable.pageSize + ':' + #pageable.sort")
     @Transactional(readOnly = true)
     public Page<ProdutoResponse> listarVitrine(Pageable pageable) {
         return produtoRepository.findAllAtivosVitrine(pageable)
                 .map(this::toResponse);
     }
 
+    @Cacheable(value = "produtosVitrine", key = "'search:' + #termo + ':' + #categoriaId + ':' + #precoMin + ':' + #precoMax + ':' + #emPromocao + ':' + #pageable.pageNumber + ':' + #pageable.pageSize")
     @Transactional(readOnly = true)
     public Page<ProdutoResponse> buscarVitrine(String termo, Long categoriaId,
                                                BigDecimal precoMin, BigDecimal precoMax,
@@ -77,6 +81,7 @@ public class ProdutoService {
         return produtoRepository.findAll(spec, pageable).map(this::toResponse);
     }
 
+    @Cacheable(value = "produtosVitrine", key = "'cat:' + #categoriaId + ':' + #pageable.pageNumber + ':' + #pageable.pageSize")
     @Transactional(readOnly = true)
     public Page<ProdutoResponse> listarVitrinePorCategoria(Long categoriaId, Pageable pageable) {
         return produtoRepository.findAllAtivosVitrineByCategoriaId(categoriaId, pageable)
@@ -98,6 +103,7 @@ public class ProdutoService {
                 .map(this::toResponse);
     }
 
+    @CacheEvict(value = "produtosVitrine", allEntries = true)
     @Transactional
     public ProdutoResponse criarProduto(ProdutoRequest request) {
         Long artesaoId = securityUtils.getUsuarioLogadoId();
@@ -127,6 +133,7 @@ public class ProdutoService {
         return toResponse(salvo);
     }
 
+    @CacheEvict(value = "produtosVitrine", allEntries = true)
     @Transactional
     public ProdutoResponse atualizarProduto(Long id, ProdutoRequest request) {
         Produto produto = buscarProdutoComValidacao(id);
@@ -151,6 +158,7 @@ public class ProdutoService {
     }
 
     // RN-01: Soft Delete — produto nunca é removido fisicamente
+    @CacheEvict(value = "produtosVitrine", allEntries = true)
     @Transactional
     public void deletarProduto(Long id) {
         Produto produto = buscarProdutoComValidacao(id);
@@ -159,6 +167,7 @@ public class ProdutoService {
     }
 
     // RN-06: Aplicar ou remover promoção com desconto
+    @CacheEvict(value = "produtosVitrine", allEntries = true)
     @Transactional
     public ProdutoResponse aplicarPromocao(Long id, PromocaoRequest request) {
         Produto produto = buscarProdutoComValidacao(id);
@@ -179,6 +188,7 @@ public class ProdutoService {
     }
 
     // RN-05 / RN-17: Marcar peça única como vendida
+    @CacheEvict(value = "produtosVitrine", allEntries = true)
     @Transactional
     public ProdutoResponse marcarVendido(Long id) {
         Produto produto = buscarProdutoComValidacao(id);
@@ -194,6 +204,7 @@ public class ProdutoService {
 
     // ======================== UPLOAD DE IMAGENS ========================
 
+    @CacheEvict(value = "produtosVitrine", allEntries = true)
     @Transactional
     public ProdutoResponse uploadImagem(Long produtoId, MultipartFile arquivo) {
         Produto produto = buscarProdutoComValidacao(produtoId);
@@ -219,6 +230,7 @@ public class ProdutoService {
         return toResponse(atualizado);
     }
 
+    @CacheEvict(value = "produtosVitrine", allEntries = true)
     @Transactional
     public ProdutoResponse removerImagem(Long produtoId, Long imagemId) {
         Produto produto = buscarProdutoComValidacao(produtoId);
