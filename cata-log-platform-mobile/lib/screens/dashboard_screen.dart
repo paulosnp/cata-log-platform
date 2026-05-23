@@ -37,10 +37,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void initState() {
     super.initState();
-    // Conectar chat após o login
+    // Conectar chat e carregar perfil após o login
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _conectarChat();
+      _carregarPerfil();
     });
+  }
+
+  void _carregarPerfil() {
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+    if (auth.isAuthenticated) {
+      Provider.of<ArtesaoProvider>(context, listen: false).carregarPerfil();
+    }
   }
 
   void _conectarChat() {
