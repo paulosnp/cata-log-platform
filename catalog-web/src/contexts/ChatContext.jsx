@@ -30,14 +30,19 @@ export function ChatProvider({ children }) {
           // Obter token do backend
           const { data } = await chatService.getToken();
 
-          // connectUser — userId deve coincidir com o backend: String.valueOf(userId)
+          console.log('[ChatContext] Token recebido:', data.token?.substring(0, 30) + '...');
+          console.log('[ChatContext] User ID:', String(user.id), '| Nome:', user.nome);
+
+          // connectUser — userId deve coincidir com o backend: comprador_ + userId
           await client.connectUser(
             {
-              id: String(user.id),
+              id: `comprador_${user.id}`,
               name: user.nome,
             },
             data.token
           );
+
+          console.log('[ChatContext] ✅ connectUser OK. Client user:', client.user?.id, '| Role:', client.user?.role);
 
           setChatClient(client);
           setChatReady(true);

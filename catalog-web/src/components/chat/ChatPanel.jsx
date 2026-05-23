@@ -6,22 +6,25 @@ import Spinner from '../common/Spinner';
 import 'stream-chat-react/dist/css/index.css';
 import './ChatPanel.css';
 
-export default function ChatPanel({ channelId }) {
+export default function ChatPanel({ channelId, compradorId, artesaoId }) {
   const { chatClient, chatReady } = useChat();
   const [channel, setChannel] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!chatReady || !chatClient || !channelId) {
+    if (!chatReady || !chatClient || !channelId || !compradorId || !artesaoId) {
       setLoading(false);
       return;
     }
 
     const initChannel = async () => {
       try {
-        const ch = chatClient.channel('messaging', channelId);
+        const ch = chatClient.channel('messaging', channelId, {
+          members: [`comprador_${compradorId}`, `artesao_${artesaoId}`],
+        });
         await ch.watch();
+        console.log('[ChatPanel] ✅ Canal conectado:', channelId);
         setChannel(ch);
       } catch (err) {
         console.error('[ChatPanel] Erro ao conectar ao canal:', err);

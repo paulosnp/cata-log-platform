@@ -1,11 +1,14 @@
 package br.com.catalog.api.service;
 
 import br.com.catalog.api.dto.chat.ChatTokenResponse;
+import br.com.catalog.api.security.JwtService;
 import br.com.catalog.api.security.SecurityUtils;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -16,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 public class ChatService {
 
     private final SecurityUtils securityUtils;
+    private final JwtService jwtService;
 
     @Value("${stream.chat.api-key}")
     private String apiKey;
@@ -35,15 +39,21 @@ public class ChatService {
     public ChatTokenResponse gerarStreamToken() {
         Long userId = securityUtils.getUsuarioLogadoId();
 
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String token = (String) auth.getCredentials();
+        String role = jwtService.extractRole(token);
+
+        String streamUserId = ("ARTESAO".equals(role) ? "artesao_" : "comprador_") + userId;
+
         SecretKey key = Keys.hmacShaKeyFor(apiSecret.getBytes(StandardCharsets.UTF_8));
 
-        String token = Jwts.builder()
-                .claim("user_id", String.valueOf(userId))
+        String streamToken = Jwts.builder()
+                .claim("user_id", streamUserId)
                 .signWith(key, Jwts.SIG.HS256)
                 .compact();
 
         return ChatTokenResponse.builder()
-                .token(token)
+                .token(streamToken)
                 .build();
     }
 }

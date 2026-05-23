@@ -85,7 +85,8 @@ export default function EncomendaDetalhePage() {
     atualizadoEm,
   } = encomenda;
 
-  const showChat = status === 'PRECO_ACORDADO' || status === 'CONCLUIDA';
+  const chatStatuses = ['PRECO_ACORDADO', 'EM_PRODUCAO', 'ENVIADO', 'ENTREGUE', 'CONCLUIDA'];
+  const showChat = chatStatuses.includes(status);
 
   return (
     <div className="min-h-[70vh] bg-surface py-8 md:py-12">
@@ -214,7 +215,11 @@ export default function EncomendaDetalhePage() {
           <div className="lg:col-span-3">
             <div className="sticky top-24" style={{ height: 'calc(100vh - 12rem)' }}>
               {showChat ? (
-                <ChatPanel channelId={streamChannelId} />
+                <ChatPanel
+                  channelId={streamChannelId}
+                  compradorId={encomenda.compradorId}
+                  artesaoId={encomenda.artesaoId}
+                />
               ) : (
                 <div className="flex h-full items-center justify-center rounded-xl border border-outline-variant/10 bg-surface-container-lowest p-8 text-center">
                   <div>

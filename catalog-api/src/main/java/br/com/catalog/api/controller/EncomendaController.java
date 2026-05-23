@@ -62,4 +62,22 @@ public class EncomendaController {
             @PageableDefault(size = 20) Pageable pageable) {
         return ResponseEntity.ok(encomendaService.listarMinhasEncomendasArtesao(pageable));
     }
+
+    @PutMapping("/{id}/producao")
+    @PreAuthorize("hasAuthority('ARTESAO')")
+    public ResponseEntity<EncomendaResponse> iniciarProducao(@PathVariable Long id) {
+        return ResponseEntity.ok(encomendaService.iniciarProducao(id));
+    }
+
+    @PutMapping("/{id}/enviar")
+    @PreAuthorize("hasAuthority('ARTESAO')")
+    public ResponseEntity<EncomendaResponse> marcarEnviado(@PathVariable Long id) {
+        return ResponseEntity.ok(encomendaService.marcarEnviado(id));
+    }
+
+    @PutMapping("/{id}/entregue")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<EncomendaResponse> confirmarEntrega(@PathVariable Long id) {
+        return ResponseEntity.ok(encomendaService.confirmarEntrega(id));
+    }
 }

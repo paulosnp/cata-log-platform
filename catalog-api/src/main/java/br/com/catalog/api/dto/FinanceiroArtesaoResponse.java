@@ -18,6 +18,7 @@ public class FinanceiroArtesaoResponse {
     private BigDecimal faturamentoMesAnterior;
     private int totalVendasMes;
     private BigDecimal saldoDisponivel;
+    private BigDecimal saldoEmEspera;
     private List<MovimentacaoResponse> movimentacoes;
 
     @Data

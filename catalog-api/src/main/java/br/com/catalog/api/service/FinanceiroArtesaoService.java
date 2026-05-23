@@ -21,6 +21,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays;
 
 @Service
 @RequiredArgsConstructor
@@ -139,12 +140,20 @@ public class FinanceiroArtesaoService {
             movimentacoes = movimentacoes.subList(0, 20);
         }
 
+        List<StatusEncomenda> escrowStatuses = Arrays.asList(
+                StatusEncomenda.PRECO_ACORDADO,
+                StatusEncomenda.EM_PRODUCAO,
+                StatusEncomenda.ENVIADO);
+        BigDecimal saldoEmEspera = encomendaRepository
+                .sumValorRetidoByArtesaoIdAndStatusIn(artesaoId, escrowStatuses);
+
         return FinanceiroArtesaoResponse.builder()
                 .faturamentoMes(faturamentoMes)
                 .faturamentoMesAnterior(faturamentoMesAnterior)
                 .totalVendasMes(totalVendasMes)
                 .saldoDisponivel(artesao.getSaldoRendimentos() != null
                         ? artesao.getSaldoRendimentos() : BigDecimal.ZERO)
+                .saldoEmEspera(saldoEmEspera)
                 .movimentacoes(movimentacoes)
                 .build();
     }

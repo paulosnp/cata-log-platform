@@ -207,58 +207,58 @@ class _FinanceiroTabState extends State<FinanceiroTab> {
         ),
       ),
 
-      // ─── Saldo Disponível ───
+      // ─── Cards de Saldo (Disponível + Em Espera) ───
       SliverToBoxAdapter(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppColors.surfaceContainerLowest,
-              borderRadius:
-                  BorderRadius.circular(AppTheme.radiusMd),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.onSurface
-                      .withValues(alpha: 0.04),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 42,
-                  height: 42,
+          child: Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: AppColors.tertiary
-                        .withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
+                    color: AppColors.surfaceContainerLowest,
+                    borderRadius:
+                        BorderRadius.circular(AppTheme.radiusMd),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.onSurface
+                            .withValues(alpha: 0.04),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
-                  child: const Icon(
-                    Icons.account_balance_wallet_outlined,
-                    color: AppColors.tertiary,
-                    size: 22,
-                  ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
                   child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Container(
+                        width: 38,
+                        height: 38,
+                        decoration: BoxDecoration(
+                          color: AppColors.tertiary
+                              .withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.account_balance_wallet_outlined,
+                          color: AppColors.tertiary,
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
                       Text(
-                        'Saldo disponível',
+                        'Disponível para saque',
                         style: GoogleFonts.manrope(
-                          fontSize: 12,
+                          fontSize: 11,
                           color: AppColors.onSurfaceVariant,
                         ),
                       ),
+                      const SizedBox(height: 4),
                       Text(
                         _formatCurrency(fin.saldoDisponivel),
                         style: GoogleFonts.plusJakartaSans(
-                          fontSize: 20,
+                          fontSize: 18,
                           fontWeight: FontWeight.w700,
                           color: AppColors.onSurface,
                         ),
@@ -266,8 +266,80 @@ class _FinanceiroTabState extends State<FinanceiroTab> {
                     ],
                   ),
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceContainerLowest,
+                    borderRadius:
+                        BorderRadius.circular(AppTheme.radiusMd),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.onSurface
+                            .withValues(alpha: 0.04),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 38,
+                            height: 38,
+                            decoration: BoxDecoration(
+                              color: AppColors.onSurfaceVariant
+                                  .withValues(alpha: 0.08),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.hourglass_empty_rounded,
+                              color: AppColors.onSurfaceVariant
+                                  .withValues(alpha: 0.7),
+                              size: 20,
+                            ),
+                          ),
+                          const Spacer(),
+                          Tooltip(
+                            message:
+                                'Valor retido até a entrega\nda encomenda ser confirmada.',
+                            preferBelow: false,
+                            child: Icon(
+                              Icons.info_outline_rounded,
+                              size: 18,
+                              color: AppColors.onSurfaceVariant
+                                  .withValues(alpha: 0.5),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Saldo em espera',
+                        style: GoogleFonts.manrope(
+                          fontSize: 11,
+                          color: AppColors.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        _formatCurrency(fin.saldoEmEspera),
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),

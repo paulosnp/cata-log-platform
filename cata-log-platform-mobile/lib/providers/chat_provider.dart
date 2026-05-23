@@ -42,7 +42,7 @@ class ChatProvider extends ChangeNotifier {
 
       await _client.connectUser(
         User(
-          id: userId.toString(),
+          id: 'artesao_$userId',
           name: userName,
         ),
         token,
@@ -80,10 +80,11 @@ class ChatProvider extends ChangeNotifier {
 
   /// Retorna um Channel do Stream Chat pelo ID.
   /// O tipo é 'messaging' (padrão para conversas 1:1).
-  Channel getChannel(String channelId) {
+  Channel getChannel(String channelId, {List<String>? memberIds}) {
     return _client.channel(
       'messaging',
       id: channelId,
+      extraData: memberIds != null ? {'members': memberIds} : null,
     );
   }
 

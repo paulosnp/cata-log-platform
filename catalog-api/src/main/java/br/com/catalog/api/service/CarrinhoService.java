@@ -30,6 +30,7 @@ public class CarrinhoService {
     private final ProdutoRepository produtoRepository;
     private final SecurityUtils securityUtils;
 
+    @Transactional
     public CarrinhoResponse verCarrinho() {
         Carrinho carrinho = buscarOuCriarCarrinho();
         return toResponse(carrinho);

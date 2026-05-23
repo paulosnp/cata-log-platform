@@ -1,9 +1,9 @@
-/// Modelo que espelha o FinanceiroArtesaoResponse do backend.
 class FinanceiroResponse {
   final double faturamentoMes;
   final double faturamentoMesAnterior;
   final int totalVendasMes;
   final double saldoDisponivel;
+  final double saldoEmEspera;
   final List<MovimentacaoResponse> movimentacoes;
 
   FinanceiroResponse({
@@ -11,6 +11,7 @@ class FinanceiroResponse {
     required this.faturamentoMesAnterior,
     required this.totalVendasMes,
     required this.saldoDisponivel,
+    required this.saldoEmEspera,
     required this.movimentacoes,
   });
 
@@ -22,6 +23,8 @@ class FinanceiroResponse {
       totalVendasMes: json['totalVendasMes'] as int? ?? 0,
       saldoDisponivel:
           (json['saldoDisponivel'] as num?)?.toDouble() ?? 0,
+      saldoEmEspera:
+          (json['saldoEmEspera'] as num?)?.toDouble() ?? 0,
       movimentacoes: (json['movimentacoes'] as List<dynamic>?)
               ?.map((e) =>
                   MovimentacaoResponse.fromJson(e as Map<String, dynamic>))
@@ -30,8 +33,6 @@ class FinanceiroResponse {
     );
   }
 
-  /// Variacao percentual entre mes atual e anterior.
-  /// Retorna null se mes anterior for zero (artesao novo).
   double? get variacao {
     if (faturamentoMesAnterior <= 0) return null;
     return ((faturamentoMes - faturamentoMesAnterior) /

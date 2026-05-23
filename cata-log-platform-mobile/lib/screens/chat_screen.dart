@@ -50,7 +50,13 @@ class _ChatScreenState extends State<ChatScreen> {
         return;
       }
 
-      final channel = chatProvider.getChannel(channelId);
+      final channel = chatProvider.getChannel(
+        channelId,
+        memberIds: [
+          'comprador_${widget.encomenda.compradorId}',
+          'artesao_${widget.encomenda.artesaoId}',
+        ],
+      );
       await channel.watch();
 
       if (mounted) {

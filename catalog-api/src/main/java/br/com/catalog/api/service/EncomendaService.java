@@ -20,6 +20,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -66,17 +68,8 @@ public class EncomendaService {
         Long artesaoId = securityUtils.getUsuarioLogadoId();
 
         EncomendaPersonalizada encomenda = buscarEncomenda(encomendaId);
-
-        // Validação de ownership: apenas o artesão dono pode responder
-        if (!encomenda.getArtesao().getId().equals(artesaoId)) {
-            throw new SecurityException("Você não tem permissão para responder esta encomenda.");
-        }
-
-        // Validação de estado: só aceita contraproposta se estiver aguardando artesão
-        if (encomenda.getStatus() != StatusEncomenda.AGUARDANDO_ARTESAO) {
-            throw new EstadoEncomendaInvalidoException(
-                    "Contraproposta só pode ser enviada quando o status for AGUARDANDO_ARTESAO. Status atual: " + encomenda.getStatus());
-        }
+        validarOwnershipArtesao(encomenda, artesaoId);
+        validarTransicao(encomenda, StatusEncomenda.AGUARDANDO_ARTESAO, "AGUARDANDO_COMPRADOR");
 
         encomenda.setPrecoProposto(request.getPrecoProposto());
         encomenda.setTempoProducaoDias(request.getTempoProducaoDias());
@@ -91,23 +84,62 @@ public class EncomendaService {
         Long compradorId = securityUtils.getUsuarioLogadoId();
 
         EncomendaPersonalizada encomenda = buscarEncomenda(encomendaId);
-
-        // Validação de ownership: apenas o comprador dono pode aceitar
-        if (!encomenda.getComprador().getId().equals(compradorId)) {
-            throw new SecurityException("Você não tem permissão para aceitar esta encomenda.");
-        }
-
-        // Validação de estado: só aceita se estiver aguardando comprador
-        if (encomenda.getStatus() != StatusEncomenda.AGUARDANDO_COMPRADOR) {
-            throw new EstadoEncomendaInvalidoException(
-                    "Encomenda só pode ser aceita quando o status for AGUARDANDO_COMPRADOR. Status atual: " + encomenda.getStatus());
-        }
+        validarOwnershipComprador(encomenda, compradorId);
+        validarTransicao(encomenda, StatusEncomenda.AGUARDANDO_COMPRADOR, "PRECO_ACORDADO");
 
         encomenda.setStatus(StatusEncomenda.PRECO_ACORDADO);
+        encomenda.setDataAceite(LocalDateTime.now());
+        encomenda.setValorRetido(encomenda.getPrecoProposto());
 
         EncomendaPersonalizada atualizada = encomendaRepository.save(encomenda);
         return toResponse(atualizada);
     }
+
+    @Transactional
+    public EncomendaResponse iniciarProducao(Long encomendaId) {
+        Long artesaoId = securityUtils.getUsuarioLogadoId();
+
+        EncomendaPersonalizada encomenda = buscarEncomenda(encomendaId);
+        validarOwnershipArtesao(encomenda, artesaoId);
+        validarTransicao(encomenda, StatusEncomenda.PRECO_ACORDADO, "EM_PRODUCAO");
+
+        encomenda.setStatus(StatusEncomenda.EM_PRODUCAO);
+        return toResponse(encomendaRepository.save(encomenda));
+    }
+
+    @Transactional
+    public EncomendaResponse marcarEnviado(Long encomendaId) {
+        Long artesaoId = securityUtils.getUsuarioLogadoId();
+
+        EncomendaPersonalizada encomenda = buscarEncomenda(encomendaId);
+        validarOwnershipArtesao(encomenda, artesaoId);
+        validarTransicao(encomenda, StatusEncomenda.EM_PRODUCAO, "ENVIADO");
+
+        encomenda.setStatus(StatusEncomenda.ENVIADO);
+        return toResponse(encomendaRepository.save(encomenda));
+    }
+
+    @Transactional
+    public EncomendaResponse confirmarEntrega(Long encomendaId) {
+        EncomendaPersonalizada encomenda = buscarEncomenda(encomendaId);
+        validarTransicao(encomenda, StatusEncomenda.ENVIADO, "ENTREGUE");
+
+        encomenda.setStatus(StatusEncomenda.ENTREGUE);
+
+        BigDecimal valorRetido = encomenda.getValorRetido();
+        if (valorRetido != null && valorRetido.compareTo(BigDecimal.ZERO) > 0) {
+            Artesao artesao = encomenda.getArtesao();
+            BigDecimal saldoAtual = artesao.getSaldoRendimentos() != null
+                    ? artesao.getSaldoRendimentos() : BigDecimal.ZERO;
+            artesao.setSaldoRendimentos(saldoAtual.add(valorRetido));
+            artesaoRepository.save(artesao);
+            encomenda.setValorRetido(BigDecimal.ZERO);
+        }
+
+        return toResponse(encomendaRepository.save(encomenda));
+    }
+
+    // ======================== LEITURA ========================
 
     @Transactional(readOnly = true)
     public Page<EncomendaResponse> listarMinhasEncomendasComprador(Pageable pageable) {
@@ -129,9 +161,30 @@ public class EncomendaService {
                 .map(this::toResponse);
     }
 
+    // ======================== PRIVADOS ========================
+
     private EncomendaPersonalizada buscarEncomenda(Long id) {
         return encomendaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Encomenda não encontrada."));
+    }
+
+    private void validarOwnershipArtesao(EncomendaPersonalizada encomenda, Long artesaoId) {
+        if (!encomenda.getArtesao().getId().equals(artesaoId)) {
+            throw new SecurityException("Você não tem permissão para alterar esta encomenda.");
+        }
+    }
+
+    private void validarOwnershipComprador(EncomendaPersonalizada encomenda, Long compradorId) {
+        if (!encomenda.getComprador().getId().equals(compradorId)) {
+            throw new SecurityException("Você não tem permissão para aceitar esta encomenda.");
+        }
+    }
+
+    private void validarTransicao(EncomendaPersonalizada encomenda, StatusEncomenda esperado, String destino) {
+        if (encomenda.getStatus() != esperado) {
+            throw new EstadoEncomendaInvalidoException(
+                    "Transição para " + destino + " requer status " + esperado + ". Atual: " + encomenda.getStatus());
+        }
     }
 
     private EncomendaResponse toResponse(EncomendaPersonalizada e) {
