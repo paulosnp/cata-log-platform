@@ -1,5 +1,5 @@
 # --- Build stage: compila o JAR com Maven ---
-FROM maven:3.9-eclipse-temurin-17-alpine AS build
+FROM maven:3.9-amazoncorretto-17 AS build
 
 WORKDIR /app
 
@@ -11,7 +11,7 @@ RUN mvn package -DskipTests -B && \
     mv target/*.jar target/app.jar
 
 # --- Runtime stage: apenas JRE + JAR ---
-FROM eclipse-temurin:17-jre-alpine
+FROM amazoncorretto:17-alpine
 
 RUN addgroup -S catalog && adduser -S catalog -G catalog
 
