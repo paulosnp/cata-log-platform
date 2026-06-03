@@ -1,6 +1,6 @@
 INSERT INTO tb_admin (email, senha, senha_temporaria)
 SELECT 'paulocardoso64h@gmail.com',
-       '$2a$10$N8UziYXFeT0eRpEIx52yzOZA6LHXYSmA7Li2F4SgaOSNN1x7k3wtC',
+       '$2b$10$EKPbESA4qmWAeMQvrq581.V.nBqStvN/5n0V7HKF7TXpY7GEMySM.',
        FALSE
 WHERE NOT EXISTS (
     SELECT 1 FROM tb_admin WHERE email = 'paulocardoso64h@gmail.com'
