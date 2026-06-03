@@ -97,7 +97,9 @@ public class SecurityConfig {
                 "https://prismcode.site",
                 "http://prismcode.site",
                 "https://www.prismcode.site",
-                "http://www.prismcode.site"
+                "http://www.prismcode.site",
+                "https://admin.prismcode.site",
+                "http://admin.prismcode.site"
         ));
         // Flutter Web roda em portas dinamicas — permitir qualquer localhost em dev
         config.setAllowedOriginPatterns(List.of("http://localhost:*"));
