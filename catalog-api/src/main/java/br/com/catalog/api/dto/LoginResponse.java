@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,6 +20,7 @@ public class LoginResponse {
     private String role;
     private String nome;
 
-    // RN-02: Flag para o frontend interceptar e redirecionar para troca de senha obrigatória
     private boolean senhaTemporaria;
+
+    private List<String> permissoes;
 }

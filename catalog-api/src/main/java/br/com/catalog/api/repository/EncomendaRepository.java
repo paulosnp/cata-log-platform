@@ -19,6 +19,8 @@ public interface EncomendaRepository extends JpaRepository<EncomendaPersonalizad
 
     Page<EncomendaPersonalizada> findByArtesaoIdOrderByAtualizadoEmDesc(Long artesaoId, Pageable pageable);
 
+    Page<EncomendaPersonalizada> findAllByOrderByAtualizadoEmDesc(Pageable pageable);
+
     @Query("SELECT COALESCE(SUM(e.valorRetido), 0) FROM EncomendaPersonalizada e " +
            "WHERE e.artesao.id = :artesaoId AND e.status IN :statuses")
     BigDecimal sumValorRetidoByArtesaoIdAndStatusIn(

@@ -105,6 +105,7 @@ public class AuthService {
                 .role("ADMIN")
                 .nome(admin.getEmail())
                 .senhaTemporaria(Boolean.TRUE.equals(admin.getSenhaTemporaria()))
+                .permissoes(permissions)
                 .build();
     }
 

@@ -1,111 +1,197 @@
-:root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+@import "tailwindcss";
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+/* ============================================================
+   CATA LOG ADMIN — Design System (Alinhado à Vitrine)
+   Light Mode default, Dark Mode via classe .dark no <html>
+   ============================================================ */
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@custom-variant dark (&:where(.dark, .dark *));
 
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
+@theme {
+  /* ---- Primary (Brand Vermelho Cata Log) ---- */
+  --color-primary: var(--ds-primary);
+  --color-primary-hover: var(--ds-primary-hover);
+  --color-primary-dim: var(--ds-primary-dim);
+  --color-primary-container: var(--ds-primary-container);
+  --color-on-primary: #ffffff;
+
+  /* ---- Semantic Colors ---- */
+  --color-success: var(--ds-success);
+  --color-success-bg: var(--ds-success-bg);
+  --color-warning: var(--ds-warning);
+  --color-warning-bg: var(--ds-warning-bg);
+  --color-danger: var(--ds-danger);
+  --color-danger-bg: var(--ds-danger-bg);
+  --color-info: var(--ds-info);
+  --color-info-bg: var(--ds-info-bg);
+
+  /* ---- Surfaces ---- */
+  --color-surface: var(--ds-surface);
+  --color-surface-light: var(--ds-surface-light);
+  --color-surface-lighter: var(--ds-surface-lighter);
+
+  /* ---- Text ---- */
+  --color-text: var(--ds-text);
+  --color-text-muted: var(--ds-text-muted);
+  --color-text-dim: var(--ds-text-dim);
+
+  /* ---- Border ---- */
+  --color-border: var(--ds-border);
+  --color-border-light: var(--ds-border-light);
+
+  /* ---- Typography ---- */
+  --font-headline: "Manrope", sans-serif;
+  --font-body: "Inter", sans-serif;
+
+  /* ---- Border Radius (da vitrine) ---- */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+
+  /* ---- Shadows ---- */
+  --shadow-ambient: var(--ds-shadow-ambient);
+  --shadow-hover: var(--ds-shadow-hover);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
+/* ---- Light Mode (default) ---- */
+:root {
+  --ds-primary: #b22300;
+  --ds-primary-hover: #8b1a00;
+  --ds-primary-dim: #dc340a;
+  --ds-primary-container: #ffdad2;
 
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
+  --ds-success: #16a34a;
+  --ds-success-bg: #f0fdf4;
+  --ds-warning: #d97706;
+  --ds-warning-bg: #fffbeb;
+  --ds-danger: #dc2626;
+  --ds-danger-bg: #fef2f2;
+  --ds-info: #2563eb;
+  --ds-info-bg: #eff6ff;
+
+  --ds-surface: #faf9f7;
+  --ds-surface-light: #ffffff;
+  --ds-surface-lighter: #f4f3f1;
+
+  --ds-text: #1a1c1b;
+  --ds-text-muted: #5c4039;
+  --ds-text-dim: #916f68;
+
+  --ds-border: #e5beb5;
+  --ds-border-light: #efeeec;
+
+  --ds-shadow-ambient: 0 12px 32px rgba(26, 28, 27, 0.06);
+  --ds-shadow-hover: 0 16px 40px rgba(26, 28, 27, 0.1);
+
+  color-scheme: light;
+}
+
+/* ---- Dark Mode ---- */
+.dark {
+  --ds-primary: #ff8a65;
+  --ds-primary-hover: #ff7043;
+  --ds-primary-dim: #ffab91;
+  --ds-primary-container: #3b0900;
+
+  --ds-success: #4ade80;
+  --ds-success-bg: #052e16;
+  --ds-warning: #fbbf24;
+  --ds-warning-bg: #422006;
+  --ds-danger: #f87171;
+  --ds-danger-bg: #450a0a;
+  --ds-info: #60a5fa;
+  --ds-info-bg: #172554;
+
+  --ds-surface: #121212;
+  --ds-surface-light: #1e1e1e;
+  --ds-surface-lighter: #2a2a2a;
+
+  --ds-text: #f5f5f5;
+  --ds-text-muted: #a8a29e;
+  --ds-text-dim: #78716c;
+
+  --ds-border: #3a3a3a;
+  --ds-border-light: #4a4a4a;
+
+  --ds-shadow-ambient: 0 12px 32px rgba(0, 0, 0, 0.3);
+  --ds-shadow-hover: 0 16px 40px rgba(0, 0, 0, 0.4);
+
+  color-scheme: dark;
+}
+
+/* ============================================================
+   BASE STYLES
+   ============================================================ */
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  margin: 0;
+  font-family: var(--font-body);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  line-height: 1.6;
+  min-height: 100dvh;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-headline);
+  color: var(--color-text);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
 
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 9999px;
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-light);
+}
+
+/* ============================================================
+   UTILITY CLASSES
+   ============================================================ */
+
+.glass-light {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.dark .glass-light {
+  background: rgba(30, 30, 30, 0.8);
+}
+
+.gradient-primary {
+  background: linear-gradient(135deg, var(--ds-primary), var(--ds-primary-dim));
+}
+
+.focus-ring:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-md);
+}
+
+input, select, textarea {
+  color-scheme: inherit;
 }

@@ -81,6 +81,19 @@ services:
     depends_on:
       - catalog-api
 
+  catalog-admin-web:
+    build:
+      context: ./catalog-admin-web
+      dockerfile: Dockerfile
+    container_name: catalog-admin-web
+    restart: unless-stopped
+    ports:
+      - "${ADMIN_PORT:-3001}:80"
+    networks:
+      - catalog-network
+    depends_on:
+      - catalog-api
+
 volumes:
   catalog_data:
     name: catalog-db-data

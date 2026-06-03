@@ -161,6 +161,12 @@ public class EncomendaService {
                 .map(this::toResponse);
     }
 
+    @Transactional(readOnly = true)
+    public Page<EncomendaResponse> listarTodasEncomendas(Pageable pageable) {
+        return encomendaRepository.findAllByOrderByAtualizadoEmDesc(pageable)
+                .map(this::toResponse);
+    }
+
     // ======================== PRIVADOS ========================
 
     private EncomendaPersonalizada buscarEncomenda(Long id) {

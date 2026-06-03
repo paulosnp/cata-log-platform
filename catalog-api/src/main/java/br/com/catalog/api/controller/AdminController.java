@@ -2,7 +2,9 @@ package br.com.catalog.api.controller;
 
 import br.com.catalog.api.dto.AdminRegistroRequest;
 import br.com.catalog.api.dto.admin.*;
+import br.com.catalog.api.dto.encomenda.EncomendaResponse;
 import br.com.catalog.api.service.AdminService;
+import br.com.catalog.api.service.EncomendaService;
 import br.com.catalog.api.service.RegistroService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,7 @@ public class AdminController {
 
     private final RegistroService registroService;
     private final AdminService adminService;
+    private final EncomendaService encomendaService;
 
     // ===================== GESTÃO DE ADMINS =====================
 
@@ -117,5 +120,13 @@ public class AdminController {
     public ResponseEntity<List<TopArtesaoResponse>> obterTopArtesaos(
             @RequestParam(defaultValue = "5") int limite) {
         return ResponseEntity.ok(adminService.obterTopArtesaos(limite));
+    }
+
+    // ===================== GESTÃO DE ENCOMENDAS =====================
+
+    @GetMapping("/encomendas")
+    public ResponseEntity<Page<EncomendaResponse>> listarEncomendas(
+            @PageableDefault(size = 20) Pageable pageable) {
+        return ResponseEntity.ok(encomendaService.listarTodasEncomendas(pageable));
     }
 }
