@@ -24,6 +24,10 @@ public class TokenBlacklistService {
     }
 
     public boolean isBlacklisted(String token) {
-        return Boolean.TRUE.equals(redisTemplate.hasKey(BLACKLIST_PREFIX + token));
+        try {
+            return Boolean.TRUE.equals(redisTemplate.hasKey(BLACKLIST_PREFIX + token));
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
