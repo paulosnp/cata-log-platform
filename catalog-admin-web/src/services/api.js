@@ -21,7 +21,11 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const status = error.response?.status
+    const url = error.config?.url || ''
+    const isAuthRoute = url.includes('/auth/')
+
+    if ((status === 401 || status === 403) && !isAuthRoute) {
       localStorage.removeItem('admin_token')
       localStorage.removeItem('admin_user')
       if (!window.location.pathname.includes('/login')) {

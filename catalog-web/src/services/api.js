@@ -29,19 +29,18 @@ api.interceptors.request.use(
 );
 
 // ======================== RESPONSE INTERCEPTOR ========================
-// Trata erros globais: 401 (token expirado) redireciona para login
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response) {
       const { status } = error.response;
+      const url = error.config?.url || '';
+      const isAuthRoute = url.includes('/auth/');
 
-      // Token expirado ou inválido → limpa sessão e redireciona
-      if (status === 401) {
+      if ((status === 401 || status === 403) && !isAuthRoute) {
         localStorage.removeItem('catalog_token');
         localStorage.removeItem('catalog_user');
 
-        // Evita redirect loop se já estiver na página de login
         if (!window.location.pathname.includes('/login')) {
           window.location.href = '/login';
         }

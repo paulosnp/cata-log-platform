@@ -1,10 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import '../core/storage/secure_storage.dart';
 import '../models/login_response.dart';
 import '../services/auth_service.dart';
 
-/// Provider central de autenticação.
-/// Gere o estado de login, loading, erro e sessão persistida.
 class AuthProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();
 
@@ -12,17 +11,11 @@ class AuthProvider extends ChangeNotifier {
   bool _isLoading = false;
   String? _errorMessage;
 
-  // ─── Getters ───
-
   LoginResponse? get user => _user;
   bool get isAuthenticated => _user != null;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
-  // ─── Login ───
-
-  /// Realiza login com email e senha.
-  /// Atualiza [isAuthenticated], [isLoading] e [errorMessage].
   Future<void> login(String email, String senha) async {
     _isLoading = true;
     _errorMessage = null;
@@ -40,13 +33,9 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  // ─── Registro ───
-
   String? _successMessage;
   String? get successMessage => _successMessage;
 
-  /// Registra um novo artesão na plataforma.
-  /// Atualiza [isLoading], [errorMessage] e [successMessage].
   Future<bool> registrar({
     required String nomeAtelie,
     required String email,
@@ -77,19 +66,21 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  // ─── Verificação de Sessão (Auto-login) ───
-
-  /// Chamado na SplashScreen para verificar se existe uma sessão ativa.
-  /// Reconstrói o [_user] a partir do SecureStorage se o token existir.
   Future<void> checkAuthStatus() async {
     final token = await SecureStorage.getToken();
     final userData = await SecureStorage.getUserData();
 
     if (token != null && token.isNotEmpty && userData != null) {
+      if (_isTokenExpired(token)) {
+        await SecureStorage.clearAll();
+        _user = null;
+        notifyListeners();
+        return;
+      }
+
       try {
         _user = LoginResponse.fromJsonString(userData);
       } catch (_) {
-        // Dados corrompidos — limpar tudo
         await SecureStorage.clearAll();
         _user = null;
       }
@@ -98,6 +89,26 @@ class AuthProvider extends ChangeNotifier {
     }
 
     notifyListeners();
+  }
+
+  bool _isTokenExpired(String token) {
+    try {
+      final parts = token.split('.');
+      if (parts.length != 3) return true;
+
+      final payload = parts[1];
+      final normalized = base64.normalize(payload);
+      final decoded = utf8.decode(base64.decode(normalized));
+      final map = json.decode(decoded) as Map<String, dynamic>;
+
+      final exp = map['exp'] as int?;
+      if (exp == null) return true;
+
+      final expiry = DateTime.fromMillisecondsSinceEpoch(exp * 1000);
+      return DateTime.now().isAfter(expiry);
+    } catch (_) {
+      return true;
+    }
   }
 
   // ─── Logout ───

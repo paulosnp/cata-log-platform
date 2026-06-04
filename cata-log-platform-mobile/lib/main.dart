@@ -4,12 +4,15 @@ import 'package:provider/provider.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'theme/app_theme.dart';
 import 'screens/splash_screen.dart';
+import 'screens/login_screen.dart';
+import 'screens/dashboard_screen.dart';
 import 'providers/auth_provider.dart';
 import 'providers/produto_provider.dart';
 import 'providers/encomenda_provider.dart';
 import 'providers/chat_provider.dart';
 import 'providers/artesao_provider.dart';
 import 'providers/financeiro_provider.dart';
+import 'core/api/api_client.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,6 +45,7 @@ class CataLogApp extends StatelessWidget {
             title: 'Cata Log',
             debugShowCheckedModeBanner: false,
             theme: AppTheme.lightTheme,
+            navigatorKey: ApiClient.navigatorKey,
             builder: (context, child) {
               return StreamChat(
                 client: chatProvider.client,
@@ -49,6 +53,10 @@ class CataLogApp extends StatelessWidget {
               );
             },
             home: const SplashScreen(),
+            routes: {
+              '/login': (_) => const LoginScreen(),
+              '/dashboard': (_) => const DashboardScreen(),
+            },
           );
         },
       ),
