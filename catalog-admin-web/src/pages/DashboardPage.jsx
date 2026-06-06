@@ -84,7 +84,7 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-text">Dashboard</h1>
           <p className="text-sm text-text-muted mt-1">Visão geral da plataforma</p>
@@ -92,7 +92,7 @@ export default function DashboardPage() {
         <button
           onClick={fetchAll}
           disabled={loading}
-          className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm text-text-muted hover:bg-surface-lighter hover:text-text transition-colors disabled:opacity-50"
+          className="flex items-center justify-center gap-2 rounded-lg border border-border px-3 py-2 text-sm text-text-muted hover:bg-surface-lighter hover:text-text transition-colors disabled:opacity-50 w-full sm:w-auto"
         >
           <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           Atualizar
@@ -139,12 +139,12 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <div className="rounded-xl border border-border bg-surface-light p-5">
-          <div className="flex items-center justify-between mb-5">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-5">
             <div className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5 text-success" />
               <h2 className="text-lg font-semibold text-text">Faturamento</h2>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <Calendar className="h-4 w-4 text-text-dim" />
               <input
                 type="date"

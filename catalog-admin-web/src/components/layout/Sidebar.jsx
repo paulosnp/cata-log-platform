@@ -9,9 +9,9 @@ import {
   Shield,
   ChevronLeft,
   ChevronRight,
+  X,
 } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
-import { useState } from 'react'
 
 const NAV_ITEMS = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard', perm: 'VER_DASHBOARD' },
@@ -22,10 +22,9 @@ const NAV_ITEMS = [
   { to: '/administradores', icon: Shield, label: 'Admins', perm: 'GERENCIAR_ADMINS' },
 ]
 
-export default function Sidebar() {
+export default function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) {
   const { hasPermission } = useAuth()
   const location = useLocation()
-  const [collapsed, setCollapsed] = useState(false)
 
   const visibleItems = NAV_ITEMS.filter(
     (item) => !item.perm || hasPermission(item.perm)
@@ -34,13 +33,22 @@ export default function Sidebar() {
   return (
     <aside
       className={`
-        fixed top-0 left-0 z-30 flex h-dvh flex-col
+        fixed top-0 left-0 z-40 flex h-dvh flex-col
         border-r border-border bg-surface-light transition-all duration-300
-        ${collapsed ? 'w-[72px]' : 'w-[260px]'}
+        ${collapsed ? 'md:w-[72px]' : 'md:w-[260px]'}
+        w-[260px]
+        ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
       `}
     >
-      <div className="flex h-16 items-center gap-3 border-b border-border px-4">
+      <div className="flex h-16 items-center justify-between gap-3 border-b border-border px-4">
         <img src={logoSvg} alt="Cata Log" className="h-9 w-auto shrink-0" />
+        <button
+          onClick={() => setMobileOpen(false)}
+          className="md:hidden rounded-lg p-1.5 text-text-dim hover:bg-surface-lighter hover:text-text transition-colors"
+          aria-label="Fechar menu"
+        >
+          <X className="h-5 w-5" />
+        </button>
       </div>
 
       <nav className="flex-1 overflow-y-auto px-3 py-4">
@@ -54,6 +62,7 @@ export default function Sidebar() {
               <li key={to}>
                 <NavLink
                   to={to}
+                  onClick={() => setMobileOpen(false)}
                   className={`
                     flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium
                     transition-all duration-200
@@ -64,7 +73,7 @@ export default function Sidebar() {
                   title={collapsed ? label : undefined}
                 >
                   <Icon className="h-5 w-5 shrink-0" />
-                  {!collapsed && <span className="truncate">{label}</span>}
+                  <span className={`truncate ${collapsed ? 'md:hidden' : ''}`}>{label}</span>
                 </NavLink>
               </li>
             )
@@ -72,7 +81,7 @@ export default function Sidebar() {
         </ul>
       </nav>
 
-      <div className="border-t border-border p-3">
+      <div className="hidden md:block border-t border-border p-3">
         <button
           onClick={() => setCollapsed(!collapsed)}
           className="flex w-full items-center justify-center rounded-lg py-2 text-text-dim hover:bg-surface-lighter hover:text-text transition-colors"

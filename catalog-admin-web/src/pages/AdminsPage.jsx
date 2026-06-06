@@ -158,23 +158,23 @@ export default function AdminsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-text">Administradores</h1>
           <p className="text-sm text-text-muted mt-1">Gerenciar curadores e permissões</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           <button
             onClick={fetchData}
             disabled={loading}
-            className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm text-text-muted hover:bg-surface-lighter hover:text-text transition-colors disabled:opacity-50"
+            className="flex items-center justify-center gap-2 rounded-lg border border-border px-3 py-2 text-sm text-text-muted hover:bg-surface-lighter hover:text-text transition-colors disabled:opacity-50"
           >
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             Atualizar
           </button>
           <button
             onClick={openRegister}
-            className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover transition-colors"
+            className="flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-hover transition-colors"
           >
             <UserPlus className="h-4 w-4" />
             Novo Admin
@@ -213,7 +213,7 @@ export default function AdminsPage() {
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={registerLoading ? undefined : () => setRegisterModal(false)}
           />
-          <div className="relative z-10 w-full max-w-md rounded-2xl border border-border bg-surface-light p-6 shadow-2xl">
+          <div className="relative z-10 w-full max-w-md mx-4 rounded-2xl border border-border bg-surface-light p-6 shadow-2xl">
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-lg font-semibold text-text">Novo Administrador</h3>
               <button

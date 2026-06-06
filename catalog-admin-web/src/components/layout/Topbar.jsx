@@ -1,9 +1,9 @@
-import { LogOut, User, Sun, Moon } from 'lucide-react'
+import { Menu, LogOut, User, Sun, Moon } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useNavigate } from 'react-router-dom'
 
-export default function Topbar() {
+export default function Topbar({ onMenuToggle }) {
   const { user, logout } = useAuth()
   const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
@@ -14,8 +14,17 @@ export default function Topbar() {
   }
 
   return (
-    <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-border glass-light px-6">
-      <h2 className="text-sm font-medium text-text-muted font-headline tracking-tight">Painel de Curadoria</h2>
+    <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-border glass-light px-4 sm:px-6">
+      <div className="flex items-center gap-3">
+        <button
+          onClick={onMenuToggle}
+          className="md:hidden flex h-9 w-9 items-center justify-center rounded-lg text-text-muted hover:bg-surface-lighter hover:text-text transition-all duration-200"
+          aria-label="Abrir menu"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+        <h2 className="text-sm font-medium text-text-muted font-headline tracking-tight">Painel de Curadoria</h2>
+      </div>
 
       <div className="flex items-center gap-3">
         <button

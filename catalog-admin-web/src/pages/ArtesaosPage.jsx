@@ -124,7 +124,7 @@ export default function ArtesaosPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-text">Artesãos</h1>
           <p className="text-sm text-text-muted mt-1">Gerenciar selos de verificação</p>
@@ -132,7 +132,7 @@ export default function ArtesaosPage() {
         <button
           onClick={() => fetchData(page)}
           disabled={loading}
-          className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm text-text-muted hover:bg-surface-lighter hover:text-text transition-colors disabled:opacity-50"
+          className="flex items-center justify-center gap-2 rounded-lg border border-border px-3 py-2 text-sm text-text-muted hover:bg-surface-lighter hover:text-text transition-colors disabled:opacity-50 w-full sm:w-auto"
         >
           <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           Atualizar

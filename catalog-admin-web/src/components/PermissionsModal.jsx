@@ -45,7 +45,7 @@ export default function PermissionsModal({ open, admin, onSave, onCancel, loadin
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={loading ? undefined : onCancel}
       />
-      <div className="relative z-10 w-full max-w-md rounded-2xl border border-border bg-surface-light p-6 shadow-2xl">
+      <div className="relative z-10 w-full max-w-md mx-4 rounded-2xl border border-border bg-surface-light p-6 shadow-2xl">
         <div className="flex items-center justify-between mb-5">
           <div>
             <h3 className="text-lg font-semibold text-text">Editar Permissões</h3>

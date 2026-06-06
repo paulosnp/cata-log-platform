@@ -44,7 +44,7 @@ export default function ConfirmModal({
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={loading ? undefined : onCancel}
       />
-      <div className="relative z-10 w-full max-w-md rounded-2xl border border-border bg-surface-light p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative z-10 w-full max-w-md mx-4 rounded-2xl border border-border bg-surface-light p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
         <button
           onClick={onCancel}
           disabled={loading}

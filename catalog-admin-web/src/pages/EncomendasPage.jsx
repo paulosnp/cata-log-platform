@@ -145,7 +145,7 @@ export default function EncomendasPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-text">Encomendas</h1>
           <p className="text-sm text-text-muted mt-1">Gerenciar encomendas personalizadas e liberação de pagamentos</p>
@@ -153,19 +153,19 @@ export default function EncomendasPage() {
         <button
           onClick={() => fetchData(page)}
           disabled={loading}
-          className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm text-text-muted hover:bg-surface-lighter hover:text-text transition-colors disabled:opacity-50"
+          className="flex items-center justify-center gap-2 rounded-lg border border-border px-3 py-2 text-sm text-text-muted hover:bg-surface-lighter hover:text-text transition-colors disabled:opacity-50 w-full sm:w-auto"
         >
           <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           Atualizar
         </button>
       </div>
 
-      <div className="flex items-center gap-3">
-        <Filter className="h-4 w-4 text-text-dim" />
+      <div className="flex items-center gap-3 w-full sm:w-auto">
+        <Filter className="h-4 w-4 text-text-dim shrink-0" />
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text outline-none focus:border-primary transition-colors"
+          className="w-full sm:w-64 rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text outline-none focus:border-primary transition-colors"
         >
           <option value="">Todos os status</option>
           {ALL_STATUSES.map((s) => (

@@ -625,83 +625,84 @@ class _EsqueciSenhaScreenState extends State<EsqueciSenhaScreen>
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(6, (i) {
-                  return Container(
-                    width: 44,
-                    height: 52,
-                    margin: EdgeInsets.only(
-                      left: i == 0 ? 0 : 6,
-                      right: i == 5 ? 0 : 6,
-                    ),
-                    child: TextField(
-                      controller: _pinControllers[i],
-                      focusNode: _pinFocusNodes[i],
-                      keyboardType: TextInputType.number,
-                      textAlign: TextAlign.center,
-                      maxLength: 1,
-                      enabled: !_isLoading,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly,
-                      ],
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w700,
-                        color: _pinError
-                            ? AppColors.error
-                            : AppColors.onSurface,
+                  return Expanded(
+                    child: Container(
+                      height: 52,
+                      margin: EdgeInsets.only(
+                        left: i == 0 ? 0 : 3,
+                        right: i == 5 ? 0 : 3,
                       ),
-                      decoration: InputDecoration(
-                        counterText: '',
-                        contentPadding:
-                            const EdgeInsets.symmetric(vertical: 12),
-                        filled: true,
-                        fillColor: _pinError
-                            ? AppColors.error.withValues(alpha: 0.06)
-                            : AppColors.surfaceContainerLow
-                                .withValues(alpha: 0.5),
-                        border: OutlineInputBorder(
-                          borderRadius:
-                              BorderRadius.circular(AppTheme.radiusMd),
-                          borderSide: BorderSide(
-                            color: _pinError
-                                ? AppColors.error
-                                : AppColors.outlineVariant
-                                    .withValues(alpha: 0.2),
+                      child: TextField(
+                        controller: _pinControllers[i],
+                        focusNode: _pinFocusNodes[i],
+                        keyboardType: TextInputType.number,
+                        textAlign: TextAlign.center,
+                        maxLength: 1,
+                        enabled: !_isLoading,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                          color: _pinError
+                              ? AppColors.error
+                              : AppColors.onSurface,
+                        ),
+                        decoration: InputDecoration(
+                          counterText: '',
+                          contentPadding:
+                              const EdgeInsets.symmetric(vertical: 12),
+                          filled: true,
+                          fillColor: _pinError
+                              ? AppColors.error.withValues(alpha: 0.06)
+                              : AppColors.surfaceContainerLow
+                                  .withValues(alpha: 0.5),
+                          border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.circular(AppTheme.radiusMd),
+                            borderSide: BorderSide(
+                              color: _pinError
+                                  ? AppColors.error
+                                  : AppColors.outlineVariant
+                                      .withValues(alpha: 0.2),
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.circular(AppTheme.radiusMd),
+                            borderSide: BorderSide(
+                              color: _pinError
+                                  ? AppColors.error
+                                  : AppColors.outlineVariant
+                                      .withValues(alpha: 0.2),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.circular(AppTheme.radiusMd),
+                            borderSide: BorderSide(
+                              color: _pinError
+                                  ? AppColors.error
+                                  : AppColors.primary,
+                              width: 1.5,
+                            ),
                           ),
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius:
-                              BorderRadius.circular(AppTheme.radiusMd),
-                          borderSide: BorderSide(
-                            color: _pinError
-                                ? AppColors.error
-                                : AppColors.outlineVariant
-                                    .withValues(alpha: 0.2),
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius:
-                              BorderRadius.circular(AppTheme.radiusMd),
-                          borderSide: BorderSide(
-                            color: _pinError
-                                ? AppColors.error
-                                : AppColors.primary,
-                            width: 1.5,
-                          ),
-                        ),
+                        onChanged: (value) {
+                          if (_pinError) setState(() => _pinError = false);
+                          if (value.isNotEmpty && i < 5) {
+                            _pinFocusNodes[i + 1].requestFocus();
+                          }
+                          if (value.isEmpty && i > 0) {
+                            _pinFocusNodes[i - 1].requestFocus();
+                          }
+                          // Auto-submit when all 6 digits entered
+                          if (_pin.length == 6) {
+                            _handleVerifyPin();
+                          }
+                        },
                       ),
-                      onChanged: (value) {
-                        if (_pinError) setState(() => _pinError = false);
-                        if (value.isNotEmpty && i < 5) {
-                          _pinFocusNodes[i + 1].requestFocus();
-                        }
-                        if (value.isEmpty && i > 0) {
-                          _pinFocusNodes[i - 1].requestFocus();
-                        }
-                        // Auto-submit when all 6 digits entered
-                        if (_pin.length == 6) {
-                          _handleVerifyPin();
-                        }
-                      },
                     ),
                   );
                 }),
