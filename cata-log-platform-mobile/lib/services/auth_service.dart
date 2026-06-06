@@ -70,6 +70,71 @@ class AuthService {
     }
   }
 
+  /// Solicita PIN de recuperação de senha por e-mail.
+  /// POST /auth/esqueci-senha
+  Future<String> esqueciSenha(String email) async {
+    try {
+      final response = await _dio.post(
+        '/auth/esqueci-senha',
+        data: {'email': email},
+      );
+      if (response.data is Map && response.data.containsKey('mensagem')) {
+        return response.data['mensagem'];
+      }
+      return 'Código enviado para seu e-mail.';
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } catch (e) {
+      throw 'Erro inesperado. Tente novamente.';
+    }
+  }
+
+  /// Verifica se o PIN informado é válido.
+  /// POST /auth/verificar-pin
+  Future<String> verificarPin(String email, String pin) async {
+    try {
+      final response = await _dio.post(
+        '/auth/verificar-pin',
+        data: {'email': email, 'pin': pin},
+      );
+      if (response.data is Map && response.data.containsKey('mensagem')) {
+        return response.data['mensagem'];
+      }
+      return 'Código verificado com sucesso.';
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } catch (e) {
+      throw 'Erro inesperado. Tente novamente.';
+    }
+  }
+
+  /// Redefine a senha usando e-mail, PIN e nova senha.
+  /// POST /auth/redefinir-senha
+  Future<String> redefinirSenha({
+    required String email,
+    required String pin,
+    required String novaSenha,
+  }) async {
+    try {
+      final response = await _dio.post(
+        '/auth/redefinir-senha',
+        data: {
+          'email': email,
+          'pin': pin,
+          'novaSenha': novaSenha,
+        },
+      );
+      if (response.data is Map && response.data.containsKey('mensagem')) {
+        return response.data['mensagem'];
+      }
+      return 'Senha redefinida com sucesso.';
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } catch (e) {
+      throw 'Erro inesperado. Tente novamente.';
+    }
+  }
+
   /// Traduz erros do Dio para mensagens amigáveis em português.
   String _handleDioError(DioException e) {
     if (e.type == DioExceptionType.connectionTimeout ||
