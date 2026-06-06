@@ -111,11 +111,13 @@ public class EmailService {
                "      text-align: center;" +
                "    }" +
                "    .header img {" +
-               "      height: 48px;" +
-               "      max-height: 48px;" +
+               "      height: 72px;" +
+               "      max-height: 72px;" +
                "      border: none;" +
                "      outline: none;" +
                "      text-decoration: none;" +
+               "      filter: brightness(0) invert(1);" +
+               "      -webkit-filter: brightness(0) invert(1);" +
                "    }" +
                "    .content {" +
                "      padding: 40px 32px;" +
@@ -142,7 +144,7 @@ public class EmailService {
                "  <div class='wrapper'>" +
                "    <div class='container'>" +
                "      <div class='header'>" +
-               "        <img src='https://prismcode.site/logo.svg' alt='Cata Log' />" +
+               "        <img src='https://prismcode.site/logo.svg' alt='Cata Log' style='height: 72px; max-height: 72px; filter: brightness(0) invert(1); -webkit-filter: brightness(0) invert(1);' />" +
                "      </div>" +
                "      <div class='content'>" +
                "        <h2 style='font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif;'>" + titulo + "</h2>" +
