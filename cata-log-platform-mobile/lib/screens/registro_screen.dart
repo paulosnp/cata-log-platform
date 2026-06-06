@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
 import '../providers/auth_provider.dart';
+import 'cadastro_verificacao_screen.dart';
 
 class RegistroScreen extends StatefulWidget {
   const RegistroScreen({super.key});
@@ -101,7 +102,14 @@ class _RegistroScreenState extends State<RegistroScreen>
           duration: const Duration(seconds: 3),
         ),
       );
-      Navigator.of(context).pop(); // Volta para o login
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => CadastroVerificacaoScreen(
+            email: _emailController.text.trim(),
+            senha: _senhaController.text.trim(),
+          ),
+        ),
+      );
     } else if (authProvider.errorMessage != null) {
       _showError(authProvider.errorMessage!);
       authProvider.clearError();

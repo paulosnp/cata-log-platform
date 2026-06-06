@@ -135,6 +135,44 @@ class AuthService {
     }
   }
 
+  /// Verifica o código de ativação do cadastro.
+  /// POST /auth/verificar-cadastro
+  Future<String> verificarCadastro(String email, String codigo) async {
+    try {
+      final response = await _dio.post(
+        '/auth/verificar-cadastro',
+        data: {'email': email, 'codigo': codigo},
+      );
+      if (response.data is Map && response.data.containsKey('mensagem')) {
+        return response.data['mensagem'];
+      }
+      return 'Conta ativada com sucesso.';
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } catch (e) {
+      throw 'Erro inesperado. Tente novamente.';
+    }
+  }
+
+  /// Reenvia o código de ativação do cadastro.
+  /// POST /auth/reenviar-verificacao
+  Future<String> reenviarVerificacao(String email) async {
+    try {
+      final response = await _dio.post(
+        '/auth/reenviar-verificacao',
+        data: {'email': email},
+      );
+      if (response.data is Map && response.data.containsKey('mensagem')) {
+        return response.data['mensagem'];
+      }
+      return 'Código reenviado com sucesso.';
+    } on DioException catch (e) {
+      throw _handleDioError(e);
+    } catch (e) {
+      throw 'Erro inesperado. Tente novamente.';
+    }
+  }
+
   /// Traduz erros do Dio para mensagens amigáveis em português.
   String _handleDioError(DioException e) {
     if (e.type == DioExceptionType.connectionTimeout ||

@@ -8,6 +8,7 @@ import '../providers/auth_provider.dart';
 import 'dashboard_screen.dart';
 import 'registro_screen.dart';
 import 'esqueci_senha_screen.dart';
+import 'cadastro_verificacao_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -97,8 +98,23 @@ class _LoginScreenState extends State<LoginScreen>
         ),
       );
     } else if (authProvider.errorMessage != null) {
-      _showError(authProvider.errorMessage!);
+      final errorMsg = authProvider.errorMessage!;
       authProvider.clearError();
+
+      if (errorMsg.toLowerCase().contains('verificação') ||
+          errorMsg.toLowerCase().contains('verificar') ||
+          errorMsg.toLowerCase().contains('pendente')) {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => CadastroVerificacaoScreen(
+              email: email,
+              senha: senha,
+            ),
+          ),
+        );
+      } else {
+        _showError(errorMsg);
+      }
     }
   }
 
