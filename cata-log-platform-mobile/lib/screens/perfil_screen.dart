@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
+import '../theme/app_snackbar.dart';
 import '../providers/artesao_provider.dart';
 import '../core/api/api_client.dart';
 
@@ -76,6 +77,8 @@ class _PerfilScreenState extends State<PerfilScreen> {
       final bytes = await photo.readAsBytes();
       final filename = photo.name;
 
+      if (!mounted) return;
+
       final provider = Provider.of<ArtesaoProvider>(context, listen: false);
       final sucesso = await provider.uploadFoto(bytes, filename);
 
@@ -84,63 +87,19 @@ class _PerfilScreenState extends State<PerfilScreen> {
       setState(() => _isUploadingFoto = false);
 
       if (sucesso) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.check_circle_outline,
-                    color: Colors.white, size: 20),
-                const SizedBox(width: 10),
-                Text(
-                  'Foto atualizada!',
-                  style: GoogleFonts.manrope(
-                      fontSize: 14, fontWeight: FontWeight.w500),
-                ),
-              ],
-            ),
-            backgroundColor: AppColors.statusOrcamentoEnviado,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-            ),
-          ),
-        );
+        AppSnackBar.showSuccess(context, 'Foto atualizada!');
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.error_outline,
-                    color: Colors.white, size: 20),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    provider.errorMessage ?? 'Erro ao enviar foto.',
-                    style: GoogleFonts.manrope(fontSize: 14),
-                  ),
-                ),
-              ],
-            ),
-            backgroundColor: AppColors.error,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-            ),
-          ),
+        AppSnackBar.showError(
+          context,
+          provider.errorMessage ?? 'Erro ao enviar foto.',
         );
         provider.clearError();
       }
     } on PlatformException catch (_) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Permissão negada. Ative o acesso à galeria.'),
-            backgroundColor: AppColors.error,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-            ),
-          ),
+        AppSnackBar.showError(
+          context,
+          'Permissão negada. Ative o acesso à galeria.',
         );
       }
     }
@@ -162,51 +121,11 @@ class _PerfilScreenState extends State<PerfilScreen> {
     if (!mounted) return;
 
     if (sucesso) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.check_circle_outline,
-                  color: Colors.white, size: 20),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  'Perfil atualizado com sucesso!',
-                  style: GoogleFonts.manrope(
-                      fontSize: 14, fontWeight: FontWeight.w500),
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: AppColors.statusOrcamentoEnviado,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-          ),
-        ),
-      );
+      AppSnackBar.showSuccess(context, 'Perfil atualizado com sucesso!');
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.error_outline,
-                  color: Colors.white, size: 20),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  provider.errorMessage ?? 'Erro ao atualizar perfil.',
-                  style: GoogleFonts.manrope(fontSize: 14),
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: AppColors.error,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-          ),
-        ),
+      AppSnackBar.showError(
+        context,
+        provider.errorMessage ?? 'Erro ao atualizar perfil.',
       );
       provider.clearError();
     }

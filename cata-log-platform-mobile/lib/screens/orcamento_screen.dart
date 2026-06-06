@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
+import '../theme/app_snackbar.dart';
 import '../models/encomenda_response.dart';
 import '../providers/encomenda_provider.dart';
 
@@ -57,29 +58,7 @@ class _OrcamentoScreenState extends State<OrcamentoScreen> {
 
     if (sucesso) {
       Navigator.of(context).pop(true);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.check_circle_outline,
-                  color: Colors.white, size: 20),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  'Proposta enviada com sucesso!',
-                  style: GoogleFonts.manrope(
-                      fontSize: 14, fontWeight: FontWeight.w500),
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: AppColors.statusOrcamentoEnviado,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-          ),
-        ),
-      );
+      AppSnackBar.showSuccess(context, 'Proposta enviada com sucesso!');
     } else if (provider.errorMessage != null) {
       _showError(provider.errorMessage!);
       provider.clearError();
@@ -87,28 +66,7 @@ class _OrcamentoScreenState extends State<OrcamentoScreen> {
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.error_outline,
-                color: AppColors.onError, size: 20),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                message,
-                style: GoogleFonts.manrope(fontSize: 14),
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: AppColors.error,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        ),
-      ),
-    );
+    AppSnackBar.showError(context, message);
   }
 
   @override

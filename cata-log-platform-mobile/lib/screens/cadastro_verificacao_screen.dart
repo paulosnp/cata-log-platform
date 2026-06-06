@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
+import '../theme/app_snackbar.dart';
 import '../services/auth_service.dart';
 import '../providers/auth_provider.dart';
 import 'dashboard_screen.dart';
@@ -145,14 +146,9 @@ class _CadastroVerificacaoScreenState extends State<CadastroVerificacaoScreen>
       if (!mounted) return;
 
       // Se não houver senha ou falhar o login, volta para o login com aviso de sucesso
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Conta ativada com sucesso! Faça login para entrar.',
-            style: GoogleFonts.manrope(fontSize: 14, fontWeight: FontWeight.w500),
-          ),
-          backgroundColor: AppColors.statusOrcamentoEnviado,
-        ),
+      AppSnackBar.showSuccess(
+        context,
+        'Conta ativada com sucesso! Faça login para entrar.',
       );
       Navigator.of(context).pop();
     } catch (e) {
@@ -182,14 +178,9 @@ class _CadastroVerificacaoScreenState extends State<CadastroVerificacaoScreen>
       
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Um novo código foi enviado para seu e-mail.',
-            style: GoogleFonts.manrope(fontSize: 14, fontWeight: FontWeight.w500),
-          ),
-          backgroundColor: AppColors.statusOrcamentoEnviado,
-        ),
+      AppSnackBar.showSuccess(
+        context,
+        'Um novo código foi enviado para seu e-mail.',
       );
     } catch (e) {
       setState(() => _error = e.toString());

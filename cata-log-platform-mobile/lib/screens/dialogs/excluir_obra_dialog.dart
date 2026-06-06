@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_theme.dart';
+import '../../theme/app_snackbar.dart';
 import '../../models/produto_response.dart';
 import '../../providers/produto_provider.dart';
 
@@ -63,34 +64,17 @@ class _ExcluirObraDialogState extends State<ExcluirObraDialog> {
 
     Navigator.of(context).pop(sucesso);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(
-              sucesso ? Icons.check_circle_outline : Icons.error_outline,
-              color: Colors.white,
-              size: 20,
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                sucesso
-                    ? '🗑️ "${widget.produto.nome}" foi excluída com sucesso.'
-                    : 'Erro ao excluir a obra. Tente novamente.',
-                style: GoogleFonts.manrope(fontSize: 14),
-              ),
-            ),
-          ],
-        ),
-        backgroundColor:
-            sucesso ? AppColors.statusOrcamentoEnviado : AppColors.error,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        ),
-      ),
-    );
+    if (sucesso) {
+      AppSnackBar.showSuccess(
+        context,
+        '🗑️ "${widget.produto.nome}" foi excluída com sucesso.',
+      );
+    } else {
+      AppSnackBar.showError(
+        context,
+        'Erro ao excluir a obra. Tente novamente.',
+      );
+    }
   }
 
   @override

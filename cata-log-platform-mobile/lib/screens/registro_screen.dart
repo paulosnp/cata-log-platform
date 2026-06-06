@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
+import '../theme/app_snackbar.dart';
 import '../providers/auth_provider.dart';
 import 'cadastro_verificacao_screen.dart';
 
@@ -80,27 +81,9 @@ class _RegistroScreenState extends State<RegistroScreen>
     if (!mounted) return;
 
     if (sucesso) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.check_circle_outline, color: Colors.white, size: 20),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  'Cadastro realizado com sucesso! Faca login para continuar.',
-                  style: GoogleFonts.manrope(fontSize: 14, fontWeight: FontWeight.w500),
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: AppColors.statusOrcamentoEnviado,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-          ),
-          duration: const Duration(seconds: 3),
-        ),
+      AppSnackBar.showSuccess(
+        context,
+        'Cadastro realizado com sucesso! Faça login para continuar.',
       );
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
@@ -117,28 +100,7 @@ class _RegistroScreenState extends State<RegistroScreen>
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.error_outline, color: AppColors.onError, size: 20),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                message,
-                style: GoogleFonts.manrope(fontSize: 14, fontWeight: FontWeight.w500),
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: AppColors.error,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        ),
-        duration: const Duration(seconds: 3),
-      ),
-    );
+    AppSnackBar.showError(context, message);
   }
 
   @override

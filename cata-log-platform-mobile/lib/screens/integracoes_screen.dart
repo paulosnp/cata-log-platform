@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_theme.dart';
+import '../theme/app_snackbar.dart';
 
 /// Tela de integrações do artesão.
 /// Permite conectar a conta Mercado Pago via OAuth para receber pagamentos.
@@ -12,26 +13,9 @@ class IntegracoesScreen extends StatelessWidget {
   void _conectarMercadoPago(BuildContext context) {
     // TODO: Quando o backend tiver o endpoint GET /integracoes/mp/auth-url,
     // abrir a URL no browser via url_launcher para o artesão autorizar.
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.info_outline_rounded, color: Colors.white, size: 20),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                'Conexão com Mercado Pago estará disponível em breve.',
-                style: GoogleFonts.manrope(fontSize: 14, fontWeight: FontWeight.w500),
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: AppColors.statusAguardando,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        ),
-      ),
+    AppSnackBar.showWarning(
+      context,
+      'Conexão com Mercado Pago estará disponível em breve.',
     );
   }
 

@@ -91,11 +91,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   void _handleLogout() async {
-    // Desconectar chat antes do logout
     final chatProvider = Provider.of<ChatProvider>(context, listen: false);
-    await chatProvider.desconectarChat();
-
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+    // Desconectar chat antes do logout
+    await chatProvider.desconectarChat();
     await authProvider.logout();
 
     if (!mounted) return;

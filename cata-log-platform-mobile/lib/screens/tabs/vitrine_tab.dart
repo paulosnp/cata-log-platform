@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_theme.dart';
+import '../../theme/app_snackbar.dart';
 import '../../providers/produto_provider.dart';
 import '../../models/produto_response.dart';
 import '../../core/api/api_client.dart';
@@ -284,15 +285,17 @@ class _VitrineTabState extends State<VitrineTab> {
                   Provider.of<ProdutoProvider>(context, listen: false);
               final sucesso = await provider.marcarVendido(produto.id);
               if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      sucesso
-                          ? '🎉 "${produto.nome}" marcada como vendida!'
-                          : 'Erro ao marcar como vendida.',
-                    ),
-                  ),
-                );
+                if (sucesso) {
+                  AppSnackBar.showSuccess(
+                    context,
+                    '🎉 "${produto.nome}" marcada como vendida!',
+                  );
+                } else {
+                  AppSnackBar.showError(
+                    context,
+                    'Erro ao marcar como vendida.',
+                  );
+                }
               }
             },
             child: const Text('Confirmar'),

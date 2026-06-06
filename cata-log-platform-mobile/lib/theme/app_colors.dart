@@ -61,4 +61,17 @@ class AppColors {
   static const Color statusAguardando = Color(0xFFE8A317);
   static const Color statusOrcamentoEnviado = Color(0xFF2E7D32);
   static const Color statusVendido = Color(0xFF6D4C41);
+
+  static const Color snackbarSuccess = Color(0xFF16A34A);
+  static const Color snackbarSuccessBg = Color(0xFFF0FDF4);
+  static const Color snackbarSuccessBorder = Color(0xFFDCFCE7);
+  static const Color snackbarSuccessText = Color(0xFF15803D);
+
+  static const Color snackbarErrorBg = Color(0xFFFEF2F2);
+  static const Color snackbarErrorBorder = Color(0xFFFEE2E2);
+  static const Color snackbarErrorText = Color(0xFFB91C1C);
+
+  static const Color snackbarWarningBg = Color(0xFFFFFBEB);
+  static const Color snackbarWarningBorder = Color(0xFFFEF3C7);
+  static const Color snackbarWarningText = Color(0xFFD97706);
 }
