@@ -50,6 +50,10 @@ public class AuthService {
         }
 
         if (Boolean.FALSE.equals(artesao.getEmailVerificado())) {
+            String codigo = String.valueOf(new Random().nextInt(100000, 999999));
+            artesao.setCodigoVerificacao(codigo);
+            artesaoRepository.save(artesao);
+            emailService.enviarCodigoVerificacaoCadastro(artesao.getEmail(), codigo);
             throw new EmailNaoVerificadoException();
         }
 
@@ -78,6 +82,10 @@ public class AuthService {
         }
 
         if (Boolean.FALSE.equals(comprador.getEmailVerificado())) {
+            String codigo = String.valueOf(new Random().nextInt(100000, 999999));
+            comprador.setCodigoVerificacao(codigo);
+            compradorRepository.save(comprador);
+            emailService.enviarCodigoVerificacaoCadastro(comprador.getEmail(), codigo);
             throw new EmailNaoVerificadoException();
         }
 
