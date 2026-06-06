@@ -15,6 +15,7 @@ Sprint*.md
 PROJECT_MAP.md
 AGENT_BEHAVIOR.md
 Prompts/
+RELATORIO_SAST_HORUSEC.md
 
 # Migração de teste local (não subir para produção)
 **/V18__seed_test_data.sql
@@ -63,3 +64,9 @@ application-staging.properties
 *.pem
 *.key
 *.crt
+
+# Horusec
+horusec_report.json
+.horusec/
+horusec.exe
+
