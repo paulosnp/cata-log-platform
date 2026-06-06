@@ -5,6 +5,7 @@ import br.com.catalog.api.event.RecuperacaoSenhaEvent;
 import br.com.catalog.api.exception.CodigoRecuperacaoInvalidoException;
 import br.com.catalog.api.exception.ContaBloqueadaException;
 import br.com.catalog.api.exception.CredenciaisInvalidasException;
+import br.com.catalog.api.exception.EmailNaoVerificadoException;
 import br.com.catalog.api.model.Admin;
 import br.com.catalog.api.model.Artesao;
 import br.com.catalog.api.model.Comprador;
@@ -47,6 +48,10 @@ public class AuthService {
             throw new ContaBloqueadaException();
         }
 
+        if (Boolean.FALSE.equals(artesao.getEmailVerificado())) {
+            throw new EmailNaoVerificadoException();
+        }
+
         String token = jwtService.generateToken(
                 artesao.getEmail(), "ARTESAO", artesao.getId()
         );
@@ -69,6 +74,10 @@ public class AuthService {
         // RN-07: Comprador bloqueado não pode acessar a plataforma
         if (Boolean.FALSE.equals(comprador.getAtivo())) {
             throw new ContaBloqueadaException();
+        }
+
+        if (Boolean.FALSE.equals(comprador.getEmailVerificado())) {
+            throw new EmailNaoVerificadoException();
         }
 
         String token = jwtService.generateToken(
@@ -220,6 +229,34 @@ public class AuthService {
             comprador.setCodigoVerificacao(null);
             compradorRepository.save(comprador);
             return;
+        }
+
+        throw new CredenciaisInvalidasException("Usuário não encontrado.");
+    }
+
+    public void verificarCadastro(String email, String codigo) {
+        Optional<Artesao> artesaoOpt = artesaoRepository.findByEmail(email);
+        if (artesaoOpt.isPresent()) {
+            Artesao artesao = artesaoOpt.get();
+            if (codigo != null && codigo.equals(artesao.getCodigoVerificacao())) {
+                artesao.setEmailVerificado(true);
+                artesao.setCodigoVerificacao(null);
+                artesaoRepository.save(artesao);
+                return;
+            }
+            throw new CodigoRecuperacaoInvalidoException("Código de ativação inválido.");
+        }
+
+        Optional<Comprador> compradorOpt = compradorRepository.findByEmail(email);
+        if (compradorOpt.isPresent()) {
+            Comprador comprador = compradorOpt.get();
+            if (codigo != null && codigo.equals(comprador.getCodigoVerificacao())) {
+                comprador.setEmailVerificado(true);
+                comprador.setCodigoVerificacao(null);
+                compradorRepository.save(comprador);
+                return;
+            }
+            throw new CodigoRecuperacaoInvalidoException("Código de ativação inválido.");
         }
 
         throw new CredenciaisInvalidasException("Usuário não encontrado.");

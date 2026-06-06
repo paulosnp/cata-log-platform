@@ -24,6 +24,11 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.FORBIDDEN, ex.getMessage());
     }
 
+    @ExceptionHandler(EmailNaoVerificadoException.class)
+    public ResponseEntity<Map<String, Object>> handleEmailNaoVerificado(EmailNaoVerificadoException ex) {
+        return buildResponse(HttpStatus.FORBIDDEN, ex.getMessage());
+    }
+
     @ExceptionHandler(AcessoNegadoException.class)
     public ResponseEntity<Map<String, Object>> handleAcessoNegado(AcessoNegadoException ex) {
         return buildResponse(HttpStatus.FORBIDDEN, ex.getMessage());

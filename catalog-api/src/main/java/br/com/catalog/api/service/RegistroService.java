@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.EnumSet;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 
 @Service
@@ -27,9 +28,12 @@ public class RegistroService {
     private final CompradorRepository compradorRepository;
     private final AdminRepository adminRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     public void registrarArtesao(ArtesaoRegistroRequest request) {
         validarEmailUnico(request.getEmail());
+
+        String codigo = String.valueOf(new Random().nextInt(100000, 999999));
 
         Artesao artesao = Artesao.builder()
                 .nomeAtelie(request.getNomeAtelie())
@@ -37,21 +41,29 @@ public class RegistroService {
                 .senha(passwordEncoder.encode(request.getSenha()))
                 .cep(request.getCep())
                 .telefoneWhatsapp(request.getTelefoneWhatsapp())
+                .emailVerificado(false)
+                .codigoVerificacao(codigo)
                 .build();
 
         artesaoRepository.save(artesao);
+        emailService.enviarCodigoVerificacaoCadastro(artesao.getEmail(), codigo);
     }
 
     public void registrarComprador(CompradorRegistroRequest request) {
         validarEmailUnico(request.getEmail());
 
+        String codigo = String.valueOf(new Random().nextInt(100000, 999999));
+
         Comprador comprador = Comprador.builder()
                 .nome(request.getNome())
                 .email(request.getEmail())
                 .senha(passwordEncoder.encode(request.getSenha()))
+                .emailVerificado(false)
+                .codigoVerificacao(codigo)
                 .build();
 
         compradorRepository.save(comprador);
+        emailService.enviarCodigoVerificacaoCadastro(comprador.getEmail(), codigo);
     }
 
     // RN-02: Apenas um Admin logado pode criar outro Admin

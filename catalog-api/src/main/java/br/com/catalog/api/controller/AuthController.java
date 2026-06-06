@@ -84,6 +84,13 @@ public class AuthController {
         return ResponseEntity.ok(Map.of("mensagem", "Senha redefinida com sucesso."));
     }
 
+    // Verificar código enviado por e-mail para ativação do cadastro (rota pública)
+    @PostMapping("/verificar-cadastro")
+    public ResponseEntity<Map<String, String>> verificarCadastro(@RequestBody Map<String, String> body) {
+        authService.verificarCadastro(body.get("email"), body.get("codigo"));
+        return ResponseEntity.ok(Map.of("mensagem", "Conta ativada com sucesso."));
+    }
+
     @PostMapping("/logout")
     public ResponseEntity<Map<String, String>> logout(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");

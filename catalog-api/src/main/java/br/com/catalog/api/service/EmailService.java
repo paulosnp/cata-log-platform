@@ -77,6 +77,34 @@ public class EmailService {
         }
     }
 
+    public void enviarCodigoVerificacaoCadastro(String destinatario, String pin) {
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
+
+            helper.setFrom(remetente);
+            helper.setTo(destinatario);
+            helper.setSubject("🔐 Ativação de Conta — Cata Log");
+
+            String conteudoHtml =
+                    "<p style='margin-bottom: 20px;'>Olá,</p>" +
+                    "<p style='margin-bottom: 20px;'>Seja muito bem-vindo(a) ao Cata Log! Para concluir o seu cadastro e ativar a sua conta, insira o código de ativação abaixo na plataforma:</p>" +
+                    "<div style='background-color: #faf9f7; border-radius: 8px; padding: 24px; text-align: center; margin: 32px 0; border: 1px dashed #e5beb5;'>" +
+                    "  <span style='font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: #5c4039; display: block; margin-bottom: 8px;'>Seu código de ativação</span>" +
+                    "  <strong style='font-family: \"Manrope\", sans-serif; font-size: 36px; color: #FE4C24; letter-spacing: 4px;'>" + pin + "</strong>" +
+                    "</div>" +
+                    "<p style='font-size: 14px; color: #5c4039; margin-bottom: 0;'>Este código é válido por 24 horas. Se você não realizou este cadastro, ignore este e-mail.</p>";
+
+            String htmlCompleto = obterTemplateHtml("Ativação de Conta", conteudoHtml);
+            helper.setText(htmlCompleto, true);
+
+            mailSender.send(mimeMessage);
+            log.info("Email de ativação de conta enviado para: {}", destinatario);
+        } catch (Exception e) {
+            log.error("Erro ao enviar email de ativação de conta para {}: {}", destinatario, e.getMessage());
+        }
+    }
+
     private String obterTemplateHtml(String titulo, String conteudoHtml) {
         return "<!DOCTYPE html>" +
                "<html>" +
