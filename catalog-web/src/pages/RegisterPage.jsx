@@ -1,10 +1,22 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Mail, Lock, ArrowRight, Sparkles, CheckCircle } from 'lucide-react';
+import { User, Mail, Lock, ArrowRight, Sparkles, CheckCircle, ShieldCheck, RefreshCw, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import Button from '../components/common/Button';
 import Input from '../components/common/Input';
+import PinInput from '../components/common/PinInput';
+import { authService } from '../services/authService';
 import logoSvg from '../assets/logo.svg';
+
+function maskEmail(email) {
+  if (!email) return '';
+  const [user, domain] = email.split('@');
+  if (!user || !domain) return email;
+  const maskedUser = user[0] + '***';
+  const [domainName, ...ext] = domain.split('.');
+  const maskedDomain = domainName[0] + '***';
+  return `${maskedUser}@${maskedDomain}.${ext.join('.')}`;
+}
 
 export default function RegisterPage() {
   const [form, setForm] = useState({
@@ -18,8 +30,30 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
+  const [step, setStep] = useState('register'); // 'register', 'verify'
+  const [pin, setPin] = useState('');
+  const [pinError, setPinError] = useState(false);
+  const [resendTimer, setResendTimer] = useState(0);
+  const [resending, setResending] = useState(false);
+
   const { register } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (step === 'verify') {
+      setResendTimer(30);
+      const interval = setInterval(() => {
+        setResendTimer((t) => {
+          if (t <= 1) {
+            clearInterval(interval);
+            return 0;
+          }
+          return t - 1;
+        });
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [step]);
 
   const handleChange = (field) => (e) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
@@ -62,10 +96,7 @@ export default function RegisterPage() {
         senha: form.senha,
       });
 
-      setSuccess(true);
-
-      // Redireciona para login após 2s
-      setTimeout(() => navigate('/login'), 2000);
+      setStep('verify');
     } catch (err) {
       const status = err.response?.status;
       const message = err.response?.data?.mensagem || err.response?.data?.message;
@@ -82,6 +113,56 @@ export default function RegisterPage() {
     }
   };
 
+  const handleVerifyPin = async (e) => {
+    e.preventDefault();
+    setGlobalError('');
+    setPinError(false);
+
+    if (pin.length !== 6) {
+      setPinError(true);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await authService.verificarCadastro(form.email.trim(), pin);
+      setSuccess(true);
+      setTimeout(() => navigate('/login'), 2000);
+    } catch (err) {
+      const message = err.response?.data?.mensagem || err.response?.data?.message;
+      setGlobalError(message || 'Código inválido ou expirado.');
+      setPinError(true);
+      setPin('');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendPin = async () => {
+    if (resendTimer > 0 || resending) return;
+
+    setResending(true);
+    setGlobalError('');
+    try {
+      await authService.reenviarVerificacao(form.email.trim());
+      setResendTimer(30);
+      const interval = setInterval(() => {
+        setResendTimer((t) => {
+          if (t <= 1) {
+            clearInterval(interval);
+            return 0;
+          }
+          return t - 1;
+        });
+      }, 1000);
+    } catch (err) {
+      const message = err.response?.data?.mensagem || err.response?.data?.message;
+      setGlobalError(message || 'Erro ao reenviar código. Tente novamente.');
+    } finally {
+      setResending(false);
+    }
+  };
+
   // Tela de sucesso
   if (success) {
     return (
@@ -90,9 +171,9 @@ export default function RegisterPage() {
           <div className="mx-auto mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary-fixed">
             <CheckCircle size={32} className="text-primary" />
           </div>
-          <h1 className="text-2xl font-bold font-headline">Conta criada!</h1>
+          <h1 className="text-2xl font-bold font-headline">Conta ativada!</h1>
           <p className="mt-3 text-on-surface-variant">
-            Sua conta foi criada com sucesso. Redirecionando para o login...
+            Sua conta foi ativada com sucesso. Redirecionando para o login...
           </p>
         </div>
       </div>
@@ -150,7 +231,7 @@ export default function RegisterPage() {
               <img src={logoSvg} alt="Cata Log" className="h-14 w-auto" />
             </Link>
             <p className="mt-2 text-sm text-on-surface-variant">
-              Crie sua conta de comprador
+              {step === 'register' ? 'Crie sua conta de comprador' : 'Confirme seu cadastro'}
             </p>
           </div>
 
@@ -161,77 +242,167 @@ export default function RegisterPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-            <Input
-              label="Nome completo"
-              type="text"
-              placeholder="Maria da Silva"
-              icon={User}
-              value={form.nome}
-              onChange={handleChange('nome')}
-              error={errors.nome}
-              required
-              autoComplete="name"
-            />
+          {/* ─── STEP: REGISTER ─── */}
+          {step === 'register' && (
+            <>
+              <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+                <Input
+                  label="Nome completo"
+                  type="text"
+                  placeholder="Maria da Silva"
+                  icon={User}
+                  value={form.nome}
+                  onChange={handleChange('nome')}
+                  error={errors.nome}
+                  required
+                  autoComplete="name"
+                />
 
-            <Input
-              label="E-mail"
-              type="email"
-              placeholder="seu@email.com"
-              icon={Mail}
-              value={form.email}
-              onChange={handleChange('email')}
-              error={errors.email}
-              required
-              autoComplete="email"
-            />
+                <Input
+                  label="E-mail"
+                  type="email"
+                  placeholder="seu@email.com"
+                  icon={Mail}
+                  value={form.email}
+                  onChange={handleChange('email')}
+                  error={errors.email}
+                  required
+                  autoComplete="email"
+                />
 
-            <Input
-              label="Senha"
-              type="password"
-              placeholder="Mínimo 6 caracteres"
-              icon={Lock}
-              value={form.senha}
-              onChange={handleChange('senha')}
-              error={errors.senha}
-              required
-              autoComplete="new-password"
-            />
+                <Input
+                  label="Senha"
+                  type="password"
+                  placeholder="Mínimo 6 caracteres"
+                  icon={Lock}
+                  value={form.senha}
+                  onChange={handleChange('senha')}
+                  error={errors.senha}
+                  required
+                  autoComplete="new-password"
+                />
 
-            <Input
-              label="Confirmar senha"
-              type="password"
-              placeholder="Repita a senha"
-              icon={Lock}
-              value={form.confirmarSenha}
-              onChange={handleChange('confirmarSenha')}
-              error={errors.confirmarSenha}
-              required
-              autoComplete="new-password"
-            />
+                <Input
+                  label="Confirmar senha"
+                  type="password"
+                  placeholder="Repita a senha"
+                  icon={Lock}
+                  value={form.confirmarSenha}
+                  onChange={handleChange('confirmarSenha')}
+                  error={errors.confirmarSenha}
+                  required
+                  autoComplete="new-password"
+                />
 
-            <Button
-              type="submit"
-              variant="primary"
-              size="lg"
-              fullWidth
-              loading={loading}
-              icon={ArrowRight}
-              className="mt-2"
-            >
-              Criar Conta
-            </Button>
-          </form>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="lg"
+                  fullWidth
+                  loading={loading}
+                  icon={ArrowRight}
+                  className="mt-2"
+                >
+                  Criar Conta
+                </Button>
+              </form>
 
-          <p className="mt-8 text-center text-sm text-on-surface-variant">
-            Já tem uma conta?{' '}
-            <Link
-              to="/login"
-              className="font-semibold text-primary hover:text-primary-dim transition-colors"
-            >
-              Entrar
-            </Link>
-          </p>
+              <p className="mt-8 text-center lg:text-left text-sm text-on-surface-variant">
+                Já tem uma conta?{' '}
+                <Link
+                  to="/login"
+                  className="font-semibold text-primary hover:text-primary-dim transition-colors"
+                >
+                  Entrar
+                </Link>
+              </p>
+            </>
+          )}
+
+          {/* ─── STEP: VERIFY ─── */}
+          {step === 'verify' && (
+            <>
+              <div className="mb-6 text-center lg:text-left">
+                <div className="mx-auto lg:mx-0 mb-3 inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary-fixed/40">
+                  <ShieldCheck size={22} className="text-primary" />
+                </div>
+                <h1 className="text-xl font-bold font-headline">Verifique seu e-mail</h1>
+                <p className="mt-2 text-sm text-on-surface-variant">
+                  Enviamos um código de confirmação de 6 dígitos para{' '}
+                  <span className="font-semibold text-on-surface">{maskEmail(form.email)}</span>
+                </p>
+              </div>
+
+              <form onSubmit={handleVerifyPin} className="flex flex-col gap-6">
+                <PinInput
+                  value={pin}
+                  onChange={(newPin) => {
+                    setPin(newPin);
+                    setPinError(false);
+                  }}
+                  error={pinError}
+                  disabled={loading}
+                />
+
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="lg"
+                  fullWidth
+                  loading={loading}
+                  disabled={pin.length !== 6}
+                  icon={ArrowRight}
+                >
+                  Verificar Código
+                </Button>
+              </form>
+
+              {/* Resend */}
+              <div className="mt-5 text-center lg:text-left">
+                <p className="text-sm text-on-surface-variant">
+                  Não recebeu?{' '}
+                  <button
+                    type="button"
+                    onClick={handleResendPin}
+                    disabled={resendTimer > 0 || resending}
+                    className={`font-semibold transition-colors ${
+                      resendTimer > 0 || resending
+                        ? 'text-outline cursor-not-allowed'
+                        : 'text-primary hover:text-primary-dim cursor-pointer'
+                    }`}
+                  >
+                    {resending ? (
+                      <span className="inline-flex items-center gap-1">
+                        <RefreshCw size={12} className="animate-spin" />
+                        Reenviando...
+                      </span>
+                    ) : resendTimer > 0 ? (
+                      `Reenviar código (${resendTimer}s)`
+                    ) : (
+                      'Reenviar código'
+                    )}
+                  </button>
+                </p>
+              </div>
+
+              {/* Back to register */}
+              <p className="mt-4 text-center lg:text-left text-sm text-on-surface-variant">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStep('register');
+                    setPin('');
+                    setGlobalError('');
+                    setPinError(false);
+                  }}
+                  className="inline-flex items-center gap-1 font-semibold text-primary hover:text-primary-dim transition-colors cursor-pointer"
+                >
+                  <ArrowLeft size={14} />
+                  Corrigir e-mail
+                </button>
+              </p>
+            </>
+          )}
         </div>
       </div>
     </div>

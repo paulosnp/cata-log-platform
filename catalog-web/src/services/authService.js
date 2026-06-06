@@ -54,6 +54,26 @@ export const authService = {
   },
 
   /**
+   * Verificar código de ativação do cadastro
+   * POST /auth/verificar-cadastro
+   * @returns {{ mensagem }}
+   */
+  async verificarCadastro(email, codigo) {
+    const { data } = await api.post(`${AUTH_PREFIX}/verificar-cadastro`, { email, codigo });
+    return data;
+  },
+
+  /**
+   * Reenviar código de ativação do cadastro
+   * POST /auth/reenviar-verificacao
+   * @returns {{ mensagem }}
+   */
+  async reenviarVerificacao(email) {
+    const { data } = await api.post(`${AUTH_PREFIX}/reenviar-verificacao`, { email });
+    return data;
+  },
+
+  /**
    * Trocar senha (requer token JWT)
    * POST /auth/trocar-senha
    * @returns {{ mensagem }}

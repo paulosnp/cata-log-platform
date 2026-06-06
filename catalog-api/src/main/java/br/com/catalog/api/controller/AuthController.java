@@ -91,6 +91,13 @@ public class AuthController {
         return ResponseEntity.ok(Map.of("mensagem", "Conta ativada com sucesso."));
     }
 
+    // Reenviar código de ativação do cadastro (rota pública)
+    @PostMapping("/reenviar-verificacao")
+    public ResponseEntity<Map<String, String>> reenviarVerificacao(@RequestBody Map<String, String> body) {
+        authService.reenviarVerificacao(body.get("email"));
+        return ResponseEntity.ok(Map.of("mensagem", "Código reenviado com sucesso."));
+    }
+
     @PostMapping("/logout")
     public ResponseEntity<Map<String, String>> logout(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");

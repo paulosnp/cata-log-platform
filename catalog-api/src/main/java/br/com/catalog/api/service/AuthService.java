@@ -34,6 +34,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final ApplicationEventPublisher eventPublisher;
+    private final EmailService emailService;
 
     // ======================== LOGIN ========================
 
@@ -281,6 +282,36 @@ public class AuthService {
 
     private String getEmailUsuarioLogado() {
         return SecurityContextHolder.getContext().getAuthentication().getName();
+    }
+
+    public void reenviarVerificacao(String email) {
+        String codigo = String.valueOf(new Random().nextInt(100000, 999999));
+
+        Optional<Artesao> artesaoOpt = artesaoRepository.findByEmail(email);
+        if (artesaoOpt.isPresent()) {
+            Artesao artesao = artesaoOpt.get();
+            if (Boolean.TRUE.equals(artesao.getEmailVerificado())) {
+                throw new IllegalArgumentException("E-mail já verificado.");
+            }
+            artesao.setCodigoVerificacao(codigo);
+            artesaoRepository.save(artesao);
+            emailService.enviarCodigoVerificacaoCadastro(email, codigo);
+            return;
+        }
+
+        Optional<Comprador> compradorOpt = compradorRepository.findByEmail(email);
+        if (compradorOpt.isPresent()) {
+            Comprador comprador = compradorOpt.get();
+            if (Boolean.TRUE.equals(comprador.getEmailVerificado())) {
+                throw new IllegalArgumentException("E-mail já verificado.");
+            }
+            comprador.setCodigoVerificacao(codigo);
+            compradorRepository.save(comprador);
+            emailService.enviarCodigoVerificacaoCadastro(email, codigo);
+            return;
+        }
+
+        throw new IllegalArgumentException("Usuário não encontrado.");
     }
 
 }
