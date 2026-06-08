@@ -7,6 +7,7 @@ import {
   ShoppingBag,
   Package,
   Shield,
+  ScrollText,
   ChevronLeft,
   ChevronRight,
   X,
@@ -20,6 +21,7 @@ const NAV_ITEMS = [
   { to: '/categorias', icon: ShoppingBag, label: 'Categorias', perm: null },
   { to: '/encomendas', icon: Package, label: 'Encomendas', perm: null },
   { to: '/administradores', icon: Shield, label: 'Admins', perm: 'GERENCIAR_ADMINS' },
+  { to: '/logs', icon: ScrollText, label: 'Logs', perm: 'VER_RELATORIOS' },
 ]
 
 export default function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) {

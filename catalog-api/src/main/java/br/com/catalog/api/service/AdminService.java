@@ -41,6 +41,7 @@ public class AdminService {
     private final PedidoRepository pedidoRepository;
     private final AdminRepository adminRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final LogAuditoriaService logAuditoriaService;
 
     @Transactional(readOnly = true)
     public DashboardResponse obterMetricasDashboard() {
@@ -68,6 +69,9 @@ public class AdminService {
                 new ArtesaoVerificadoEvent(salvo.getEmail(), salvo.getNomeAtelie())
         );
 
+        logAuditoriaService.registrar("VERIFICAR_ARTESAO", "ARTESAO", id,
+                "Selo de verificação concedido ao ateliê: " + salvo.getNomeAtelie());
+
         return toAdminResponse(salvo);
     }
 
@@ -76,6 +80,10 @@ public class AdminService {
         Artesao artesao = buscarArtesao(id);
         artesao.setSeloVerificado(false);
         Artesao salvo = artesaoRepository.save(artesao);
+
+        logAuditoriaService.registrar("REMOVER_VERIFICACAO", "ARTESAO", id,
+                "Selo de verificação removido do ateliê: " + salvo.getNomeAtelie());
+
         return toAdminResponse(salvo);
     }
 
@@ -111,6 +119,10 @@ public class AdminService {
         Comprador comprador = buscarComprador(id);
         comprador.setAtivo(false);
         Comprador salvo = compradorRepository.save(comprador);
+
+        logAuditoriaService.registrar("BLOQUEAR_COMPRADOR", "COMPRADOR", id,
+                "Comprador bloqueado: " + salvo.getEmail());
+
         return toCompradorResponse(salvo);
     }
 
@@ -119,6 +131,10 @@ public class AdminService {
         Comprador comprador = buscarComprador(id);
         comprador.setAtivo(true);
         Comprador salvo = compradorRepository.save(comprador);
+
+        logAuditoriaService.registrar("DESBLOQUEAR_COMPRADOR", "COMPRADOR", id,
+                "Comprador desbloqueado: " + salvo.getEmail());
+
         return toCompradorResponse(salvo);
     }
 
@@ -207,6 +223,10 @@ public class AdminService {
         admin.getPermissoes().clear();
         admin.getPermissoes().addAll(novasPermissoes);
         Admin salvo = adminRepository.save(admin);
+
+        logAuditoriaService.registrar("ALTERAR_PERMISSOES", "ADMIN", adminId,
+                "Permissões atualizadas para: " + novasPermissoes);
+
         return toAdminResponse(salvo);
     }
 

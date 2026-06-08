@@ -11,6 +11,7 @@ import CompradoresPage from './pages/CompradoresPage'
 import CategoriasPage from './pages/CategoriasPage'
 import EncomendasPage from './pages/EncomendasPage'
 import AdminsPage from './pages/AdminsPage'
+import LogsPage from './pages/LogsPage'
 
 export default function App() {
   return (
@@ -29,6 +30,7 @@ export default function App() {
                 <Route path="categorias" element={<CategoriasPage />} />
                 <Route path="encomendas" element={<EncomendasPage />} />
                 <Route path="administradores" element={<AdminsPage />} />
+                <Route path="logs" element={<LogsPage />} />
               </Route>
             </Route>
           </Routes>

@@ -5,6 +5,7 @@ import br.com.catalog.api.dto.admin.*;
 import br.com.catalog.api.dto.encomenda.EncomendaResponse;
 import br.com.catalog.api.service.AdminService;
 import br.com.catalog.api.service.EncomendaService;
+import br.com.catalog.api.service.LogAuditoriaService;
 import br.com.catalog.api.service.RegistroService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class AdminController {
     private final RegistroService registroService;
     private final AdminService adminService;
     private final EncomendaService encomendaService;
+    private final LogAuditoriaService logAuditoriaService;
 
     // ===================== GESTÃO DE ADMINS =====================
 
@@ -128,5 +130,22 @@ public class AdminController {
     public ResponseEntity<Page<EncomendaResponse>> listarEncomendas(
             @PageableDefault(size = 20) Pageable pageable) {
         return ResponseEntity.ok(encomendaService.listarTodasEncomendas(pageable));
+    }
+
+    // ===================== LOGS DE AUDITORIA =====================
+
+    @GetMapping("/logs")
+    @PreAuthorize("hasAuthority('VER_RELATORIOS')")
+    public ResponseEntity<Page<LogAuditoriaResponse>> listarLogs(
+            @PageableDefault(size = 20, sort = "dataHora", direction = org.springframework.data.domain.Sort.Direction.DESC) Pageable pageable,
+            @RequestParam(required = false) String acao,
+            @RequestParam(required = false) Long adminId,
+            @RequestParam(required = false) String inicio,
+            @RequestParam(required = false) String fim) {
+
+        LocalDateTime dataInicio = inicio != null ? LocalDateTime.parse(inicio) : null;
+        LocalDateTime dataFim = fim != null ? LocalDateTime.parse(fim) : null;
+
+        return ResponseEntity.ok(logAuditoriaService.listarLogs(pageable, acao, adminId, dataInicio, dataFim));
     }
 }
