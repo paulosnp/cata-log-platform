@@ -9,6 +9,7 @@ import br.com.catalog.api.model.Pedido;
 import br.com.catalog.api.model.enums.StatusEntrega;
 import br.com.catalog.api.repository.ArtesaoRepository;
 import br.com.catalog.api.repository.PedidoRepository;
+import br.com.catalog.api.security.VerificadorPosse;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class LogisticaService {
     private final ObjectMapper objectMapper;
     private final PedidoRepository pedidoRepository;
     private final ArtesaoRepository artesaoRepository;
+    private final VerificadorPosse verificadorPosse;
 
     @Value("${melhorenvio.token:}")
     private String melhorEnvioToken;
@@ -69,8 +71,8 @@ public class LogisticaService {
 
     public GerarEnvioResponse gerarEnvioCompleto(GerarEnvioRequest request) {
         Artesao artesao = getArtesaoLogado();
-        Pedido pedido = pedidoRepository.findById(request.getPedidoId())
-                .orElseThrow(() -> new IllegalArgumentException("Pedido não encontrado com ID: " + request.getPedidoId()));
+        // Fora do try: 404/409 de posse não pode virar o RuntimeException genérico do catch
+        Pedido pedido = verificadorPosse.pedidoDoArtesao(request.getPedidoId());
 
         try {
             // Passo 1: Inserir no carrinho do Melhor Envio

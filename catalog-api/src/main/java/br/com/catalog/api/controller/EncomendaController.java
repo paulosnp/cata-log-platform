@@ -44,7 +44,7 @@ public class EncomendaController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('COMPRADOR', 'ARTESAO')")
+    @PreAuthorize("hasAnyAuthority('COMPRADOR', 'ARTESAO', 'ADMIN')")
     public ResponseEntity<EncomendaResponse> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(encomendaService.buscarPorId(id));
     }

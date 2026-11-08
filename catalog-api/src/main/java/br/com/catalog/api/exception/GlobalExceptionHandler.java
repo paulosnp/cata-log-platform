@@ -49,6 +49,16 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
+    @ExceptionHandler(RecursoNaoEncontradoException.class)
+    public ResponseEntity<Map<String, Object>> handleRecursoNaoEncontrado(RecursoNaoEncontradoException ex) {
+        return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
+    @ExceptionHandler(PedidoMultiArtesaoException.class)
+    public ResponseEntity<Map<String, Object>> handlePedidoMultiArtesao(PedidoMultiArtesaoException ex) {
+        return buildResponse(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
     @ExceptionHandler(CategoriaNaoEncontradaException.class)
     public ResponseEntity<Map<String, Object>> handleCategoriaNaoEncontrada(CategoriaNaoEncontradaException ex) {
         return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());

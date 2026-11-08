@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,12 @@ public class JwtService {
 
     @Value("${jwt.expiration}")
     private long expiration;
+
+    // Falha no boot se o segredo for vazio ou < 256 bits (WeakKeyException), em vez de só no 1º login
+    @PostConstruct
+    void validarSegredo() {
+        getSigningKey();
+    }
 
     public String generateToken(String email, String role, Long userId) {
         return generateToken(email, role, userId, Collections.emptyList());

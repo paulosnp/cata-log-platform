@@ -14,6 +14,7 @@ import br.com.catalog.api.repository.CompradorRepository;
 import br.com.catalog.api.repository.EncomendaRepository;
 import br.com.catalog.api.repository.ProdutoRepository;
 import br.com.catalog.api.security.SecurityUtils;
+import br.com.catalog.api.security.VerificadorPosse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +34,7 @@ public class EncomendaService {
     private final ArtesaoRepository artesaoRepository;
     private final ProdutoRepository produtoRepository;
     private final SecurityUtils securityUtils;
+    private final VerificadorPosse verificadorPosse;
 
     @Transactional
     public EncomendaResponse criarEncomenda(NovaEncomendaRequest request) {
@@ -65,10 +67,7 @@ public class EncomendaService {
 
     @Transactional
     public EncomendaResponse enviarContraproposta(Long encomendaId, ContrapropostaRequest request) {
-        Long artesaoId = securityUtils.getUsuarioLogadoId();
-
-        EncomendaPersonalizada encomenda = buscarEncomenda(encomendaId);
-        validarOwnershipArtesao(encomenda, artesaoId);
+        EncomendaPersonalizada encomenda = verificadorPosse.encomenda(encomendaId);
         validarTransicao(encomenda, StatusEncomenda.AGUARDANDO_ARTESAO, "AGUARDANDO_COMPRADOR");
 
         encomenda.setPrecoProposto(request.getPrecoProposto());
@@ -81,10 +80,7 @@ public class EncomendaService {
 
     @Transactional
     public EncomendaResponse aceitarEncomenda(Long encomendaId) {
-        Long compradorId = securityUtils.getUsuarioLogadoId();
-
-        EncomendaPersonalizada encomenda = buscarEncomenda(encomendaId);
-        validarOwnershipComprador(encomenda, compradorId);
+        EncomendaPersonalizada encomenda = verificadorPosse.encomenda(encomendaId);
         validarTransicao(encomenda, StatusEncomenda.AGUARDANDO_COMPRADOR, "PRECO_ACORDADO");
 
         encomenda.setStatus(StatusEncomenda.PRECO_ACORDADO);
@@ -97,10 +93,7 @@ public class EncomendaService {
 
     @Transactional
     public EncomendaResponse iniciarProducao(Long encomendaId) {
-        Long artesaoId = securityUtils.getUsuarioLogadoId();
-
-        EncomendaPersonalizada encomenda = buscarEncomenda(encomendaId);
-        validarOwnershipArtesao(encomenda, artesaoId);
+        EncomendaPersonalizada encomenda = verificadorPosse.encomenda(encomendaId);
         validarTransicao(encomenda, StatusEncomenda.PRECO_ACORDADO, "EM_PRODUCAO");
 
         encomenda.setStatus(StatusEncomenda.EM_PRODUCAO);
@@ -109,10 +102,7 @@ public class EncomendaService {
 
     @Transactional
     public EncomendaResponse marcarEnviado(Long encomendaId) {
-        Long artesaoId = securityUtils.getUsuarioLogadoId();
-
-        EncomendaPersonalizada encomenda = buscarEncomenda(encomendaId);
-        validarOwnershipArtesao(encomenda, artesaoId);
+        EncomendaPersonalizada encomenda = verificadorPosse.encomenda(encomendaId);
         validarTransicao(encomenda, StatusEncomenda.EM_PRODUCAO, "ENVIADO");
 
         encomenda.setStatus(StatusEncomenda.ENVIADO);
@@ -121,7 +111,7 @@ public class EncomendaService {
 
     @Transactional
     public EncomendaResponse confirmarEntrega(Long encomendaId) {
-        EncomendaPersonalizada encomenda = buscarEncomenda(encomendaId);
+        EncomendaPersonalizada encomenda = verificadorPosse.encomenda(encomendaId);
         validarTransicao(encomenda, StatusEncomenda.ENVIADO, "ENTREGUE");
 
         encomenda.setStatus(StatusEncomenda.ENTREGUE);
@@ -150,8 +140,7 @@ public class EncomendaService {
 
     @Transactional(readOnly = true)
     public EncomendaResponse buscarPorId(Long id) {
-        EncomendaPersonalizada encomenda = buscarEncomenda(id);
-        return toResponse(encomenda);
+        return toResponse(verificadorPosse.encomenda(id));
     }
 
     @Transactional(readOnly = true)
@@ -168,23 +157,6 @@ public class EncomendaService {
     }
 
     // ======================== PRIVADOS ========================
-
-    private EncomendaPersonalizada buscarEncomenda(Long id) {
-        return encomendaRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Encomenda não encontrada."));
-    }
-
-    private void validarOwnershipArtesao(EncomendaPersonalizada encomenda, Long artesaoId) {
-        if (!encomenda.getArtesao().getId().equals(artesaoId)) {
-            throw new SecurityException("Você não tem permissão para alterar esta encomenda.");
-        }
-    }
-
-    private void validarOwnershipComprador(EncomendaPersonalizada encomenda, Long compradorId) {
-        if (!encomenda.getComprador().getId().equals(compradorId)) {
-            throw new SecurityException("Você não tem permissão para aceitar esta encomenda.");
-        }
-    }
 
     private void validarTransicao(EncomendaPersonalizada encomenda, StatusEncomenda esperado, String destino) {
         if (encomenda.getStatus() != esperado) {
