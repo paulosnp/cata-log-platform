@@ -17,6 +17,12 @@ public class SecurityUtils {
         return jwtService.extractUserId(token);
     }
 
+    /** Claim "role" do JWT: ADMIN, ARTESAO ou COMPRADOR. */
+    public String getPapelUsuarioLogado() {
+        String token = (String) SecurityContextHolder.getContext().getAuthentication().getCredentials();
+        return jwtService.extractRole(token);
+    }
+
     public String getEmailUsuarioLogado() {
         return SecurityContextHolder.getContext().getAuthentication().getName();
     }

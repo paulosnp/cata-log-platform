@@ -3,6 +3,7 @@ package br.com.catalog.api.service;
 import br.com.catalog.api.model.Pedido;
 import br.com.catalog.api.model.enums.StatusPagamento;
 import br.com.catalog.api.repository.PedidoRepository;
+import br.com.catalog.api.security.VerificadorPosse;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mercadopago.client.preference.PreferenceBackUrlsRequest;
@@ -27,6 +28,7 @@ public class PagamentoService {
     private final PedidoRepository pedidoRepository;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
+    private final VerificadorPosse verificadorPosse;
 
     @Value("${mercadopago.access-token}")
     private String accessToken;
@@ -36,8 +38,7 @@ public class PagamentoService {
     // ======================== CRIAR PREFERÊNCIA (Sprint 16) ========================
 
     public String criarPreferenciaPagamento(Long pedidoId) {
-        Pedido pedido = pedidoRepository.findById(pedidoId)
-                .orElseThrow(() -> new IllegalArgumentException("Pedido não encontrado com ID: " + pedidoId));
+        Pedido pedido = verificadorPosse.pedidoDoComprador(pedidoId);
 
         try {
             PreferenceItemRequest item = PreferenceItemRequest.builder()
